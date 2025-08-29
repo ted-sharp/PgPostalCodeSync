@@ -3,6 +3,38 @@
     "context7": {
       "httpUrl": "https://mcp.context7.com/mcp",
       "description": "Up-to-date code documentation and examples"
+    },
+    "msdocs": {
+      "type": "http",
+      "url": "https://learn.microsoft.com/api/mcp"
+    },
+    "fetch": {
+      "command": "uvx",
+      "args": ["mcp-server-fetch"]
+    },
+    "datetime": {
+      "command": "uvx",
+      "args": ["mcp-datetime"]
+    },
+    "filesystem": {
+      "command": "uvx",
+      "args": ["mcp-server-filesystem", "--base-path", "."]
+    },
+    "git": {
+      "command": "uvx",
+      "args": ["mcp-server-git", "--repository", "."]
+    },
+    "github": {
+      "command": "uvx",
+      "args": ["mcp-server-github"]
+    },
+    "postgresql": {
+      "command": "uvx",
+      "args": ["mcp-server-postgres"]
+    },
+    "docker": {
+      "command": "uvx",
+      "args": ["mcp-server-docker"]
     }
   }
 }
