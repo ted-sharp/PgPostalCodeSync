@@ -5,11 +5,11 @@
 -- Application  : A5:SQL Mk-2
 
 /*
-  << ’ˆÓII >>
-  BackupToTempTable, RestoreFromTempTable‹^—–½—ß‚ª•t‰Á‚³‚ê‚Ä‚¢‚Ü‚·B
-  ‚±‚ê‚É‚æ‚èAdrop table, create table Œã‚àƒf[ƒ^‚ªc‚è‚Ü‚·B
-  ‚±‚Ì‹@”\‚Íˆê“I‚É $$TableName ‚Ì‚æ‚¤‚Èˆêƒe[ƒuƒ‹‚ğì¬‚µ‚Ü‚·B
-  ‚±‚Ì‹@”\‚Í A5:SQL Mk-2‚Å‚Ì‚İ—LŒø‚Å‚ ‚é‚±‚Æ‚É’ˆÓ‚µ‚Ä‚­‚¾‚³‚¢B
+  << ï¿½ï¿½ï¿½ÓIï¿½I >>
+  BackupToTempTable, RestoreFromTempTableï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½ß‚ï¿½ï¿½tï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½Ü‚ï¿½ï¿½B
+  ï¿½ï¿½ï¿½ï¿½É‚ï¿½ï¿½Adrop table, create table ï¿½ï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½ï¿½ï¿½cï¿½ï¿½Ü‚ï¿½ï¿½B
+  ï¿½ï¿½ï¿½Ì‹@ï¿½\ï¿½Íˆêï¿½Iï¿½ï¿½ $$TableName ï¿½Ì‚æ‚¤ï¿½Èˆêï¿½eï¿½[ï¿½uï¿½ï¿½ï¿½ï¿½ï¿½ì¬ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½B
+  ï¿½ï¿½ï¿½Ì‹@ï¿½\ï¿½ï¿½ A5:SQL Mk-2ï¿½Å‚Ì‚İ—Lï¿½ï¿½ï¿½Å‚ï¿½ï¿½é‚±ï¿½Æ‚É’ï¿½ï¿½Ó‚ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 */
 
 -- ext.ingestion_files
@@ -88,24 +88,24 @@ CREATE TABLE ext.postal_codes_landed (
 ) ;
 
 COMMENT ON TABLE ext.ingestion_files IS 'ext.ingestion_files';
-COMMENT ON COLUMN ext.ingestion_files.file_id IS 'æƒtƒ@ƒCƒ‹ID';
-COMMENT ON COLUMN ext.ingestion_files.run_id IS 'æÀsID';
-COMMENT ON COLUMN ext.ingestion_files.source_uri IS 'æ“¾Œ³URI';
-COMMENT ON COLUMN ext.ingestion_files.file_name IS 'ƒtƒ@ƒCƒ‹–¼';
-COMMENT ON COLUMN ext.ingestion_files.size_bytes IS 'ƒTƒCƒY(ƒoƒCƒg)';
-COMMENT ON COLUMN ext.ingestion_files.hash_sha256 IS 'SHA-256ƒnƒbƒVƒ…';
+COMMENT ON COLUMN ext.ingestion_files.file_id IS 'ï¿½æï¿½tï¿½@ï¿½Cï¿½ï¿½ID';
+COMMENT ON COLUMN ext.ingestion_files.run_id IS 'ï¿½æï¿½ï¿½ï¿½sID';
+COMMENT ON COLUMN ext.ingestion_files.source_uri IS 'ï¿½æ“¾ï¿½ï¿½URI';
+COMMENT ON COLUMN ext.ingestion_files.file_name IS 'ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½';
+COMMENT ON COLUMN ext.ingestion_files.size_bytes IS 'ï¿½Tï¿½Cï¿½Y(ï¿½oï¿½Cï¿½g)';
+COMMENT ON COLUMN ext.ingestion_files.hash_sha256 IS 'SHA-256ï¿½nï¿½bï¿½Vï¿½ï¿½';
 
 COMMENT ON TABLE ext.ingestion_runs IS 'ext.ingestion_runs';
-COMMENT ON COLUMN ext.ingestion_runs.run_id IS 'æÀsID';
-COMMENT ON COLUMN ext.ingestion_runs.source_system IS 'æŒ³ƒVƒXƒeƒ€';
-COMMENT ON COLUMN ext.ingestion_runs.version_date IS 'ƒf[ƒ^”Å“ú';
-COMMENT ON COLUMN ext.ingestion_runs.mode IS 'æƒ‚[ƒh';
-COMMENT ON COLUMN ext.ingestion_runs.started_at IS 'ŠJn“ú';
-COMMENT ON COLUMN ext.ingestion_runs.finished_at IS 'I—¹“ú';
-COMMENT ON COLUMN ext.ingestion_runs.status IS 'ƒXƒe[ƒ^ƒX';
-COMMENT ON COLUMN ext.ingestion_runs.landed_rows IS 'æŒ”';
-COMMENT ON COLUMN ext.ingestion_runs.notes IS '”õl';
-COMMENT ON COLUMN ext.ingestion_runs.errors IS 'ƒGƒ‰[Ú×';
+COMMENT ON COLUMN ext.ingestion_runs.run_id IS 'ï¿½æï¿½ï¿½ï¿½sID';
+COMMENT ON COLUMN ext.ingestion_runs.source_system IS 'ï¿½æï¿½ï¿½ï¿½Vï¿½Xï¿½eï¿½ï¿½';
+COMMENT ON COLUMN ext.ingestion_runs.version_date IS 'ï¿½fï¿½[ï¿½^ï¿½Å“ï¿½';
+COMMENT ON COLUMN ext.ingestion_runs.mode IS 'ï¿½æï¿½ï¿½ï¿½[ï¿½h';
+COMMENT ON COLUMN ext.ingestion_runs.started_at IS 'ï¿½Jï¿½nï¿½ï¿½ï¿½ï¿½';
+COMMENT ON COLUMN ext.ingestion_runs.finished_at IS 'ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½';
+COMMENT ON COLUMN ext.ingestion_runs.status IS 'ï¿½Xï¿½eï¿½[ï¿½^ï¿½X';
+COMMENT ON COLUMN ext.ingestion_runs.landed_rows IS 'ï¿½æï¿½ï¿½ï¿½ï¿½';
+COMMENT ON COLUMN ext.ingestion_runs.notes IS 'ï¿½ï¿½ï¿½l';
+COMMENT ON COLUMN ext.ingestion_runs.errors IS 'ï¿½Gï¿½ï¿½ï¿½[ï¿½Úï¿½';
 
 COMMENT ON TABLE ext.postal_codes IS 'ext.postal_codes';
 COMMENT ON COLUMN ext.postal_codes.id IS 'id';
@@ -118,22 +118,22 @@ COMMENT ON COLUMN ext.postal_codes.city IS 'city';
 COMMENT ON COLUMN ext.postal_codes.town IS 'town';
 COMMENT ON COLUMN ext.postal_codes.run_id IS 'run_id';
 
-COMMENT ON TABLE ext.postal_codes_landed IS 'ext.postal_codes_landed:“ú–{—X•Ö‚Ì—X•Ö”Ô†CSV(UTF-8)‚ğæ‚è‚Ş‚½‚ß‚Ìˆêƒe[ƒuƒ‹‚Å‚·B
-ƒf[ƒ^‚ª•s—v‚È‚çˆ—Œã‚É TRUNCATE „§B
-æ—pƒe[ƒuƒ‹‚ª‘‚¦‚½ê‡‚Í etl ƒXƒL[ƒ}‚Ö‚ÌˆÚs‚ğŒŸ“¢‚µ‚Ü‚·B';
-COMMENT ON COLUMN ext.postal_codes_landed.local_government_code IS '‘S‘’n•ûŒö‹¤’c‘ÌƒR[ƒh:JIS X0401AX0402';
-COMMENT ON COLUMN ext.postal_codes_landed.old_zip_code5 IS '‹Œ—X•Ö”Ô†(5Œ…)';
-COMMENT ON COLUMN ext.postal_codes_landed.zip_code7 IS '—X•Ö”Ô†(7Œ…)';
-COMMENT ON COLUMN ext.postal_codes_landed.prefecture_katakana IS '“s“¹•{Œ§–¼(ƒJƒi)';
-COMMENT ON COLUMN ext.postal_codes_landed.city_katakana IS 's‹æ’¬‘º–¼(ƒJƒi)';
-COMMENT ON COLUMN ext.postal_codes_landed.town_katakana IS '’¬ˆæ–¼(ƒJƒi)';
-COMMENT ON COLUMN ext.postal_codes_landed.prefecture IS '“s“¹•{Œ§–¼';
-COMMENT ON COLUMN ext.postal_codes_landed.city IS 's‹æ’¬‘º–¼';
-COMMENT ON COLUMN ext.postal_codes_landed.town IS '’¬ˆæ–¼';
-COMMENT ON COLUMN ext.postal_codes_landed.is_multi_zip IS '•¡”—X•Ö”Ô†ƒtƒ‰ƒO:ˆê’¬ˆæ‚ª“ñˆÈã‚Ì—X•Ö”Ô†‚Å•\‚³‚ê‚éê‡‚Ì•\¦i"1": ŠY“–A"0": ŠY“–‚¹‚¸j';
-COMMENT ON COLUMN ext.postal_codes_landed.is_koaza IS '¬š”Ô’nƒtƒ‰ƒO:¬š–ˆ‚É”Ô’n‚ª‹N”Ô‚³‚ê‚Ä‚¢‚é’¬ˆæ‚Ì•\¦i"1": ŠY“–A"0": ŠY“–‚¹‚¸j';
-COMMENT ON COLUMN ext.postal_codes_landed.is_chome IS '’š–Úƒtƒ‰ƒO:’š–Ú‚ğ—L‚·‚é’¬ˆæ‚Ìê‡‚Ì•\¦i"1": ŠY“–A"0": ŠY“–‚¹‚¸j';
-COMMENT ON COLUMN ext.postal_codes_landed.is_multi_town IS '•¡”’¬ˆæƒtƒ‰ƒO:ˆê‚Â‚Ì—X•Ö”Ô†‚Å“ñˆÈã‚Ì’¬ˆæ‚ğ•\‚·ê‡‚Ì•\¦i"1": ŠY“–A"0": ŠY“–‚¹‚¸j';
-COMMENT ON COLUMN ext.postal_codes_landed.update_status IS 'XVƒtƒ‰ƒO:XV‚Ì•\¦i"0": •ÏX‚È‚µA"1": •ÏX‚ ‚èA"2": ”p~j';
-COMMENT ON COLUMN ext.postal_codes_landed.update_reason IS 'XV——R:•ÏX——Ri"0": •ÏX‚È‚µA"1": s­“™{sA"2": Z‹•\¦‚ÌÀ{A"3": ‹æ‰æ®—A"4": —X•Ö‹æ’²®“™A"5": ’ù³A"6": ”p~j';
+COMMENT ON TABLE ext.postal_codes_landed IS 'ext.postal_codes_landed:ï¿½ï¿½ï¿½{ï¿½Xï¿½Ö‚Ì—Xï¿½Ö”Ôï¿½CSV(UTF-8)ï¿½ï¿½ï¿½ï¿½èï¿½Ş‚ï¿½ï¿½ß‚Ìˆêï¿½eï¿½[ï¿½uï¿½ï¿½ï¿½Å‚ï¿½ï¿½B
+ï¿½fï¿½[ï¿½^ï¿½ï¿½ï¿½sï¿½vï¿½È‚çˆï¿½ï¿½ï¿½ï¿½ï¿½ TRUNCATE ï¿½ï¿½ï¿½ï¿½ï¿½B
+ï¿½æï¿½pï¿½eï¿½[ï¿½uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‡ï¿½ï¿½ etl ï¿½Xï¿½Lï¿½[ï¿½}ï¿½Ö‚ÌˆÚsï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½B';
+COMMENT ON COLUMN ext.postal_codes_landed.local_government_code IS 'ï¿½Sï¿½ï¿½ï¿½nï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½cï¿½ÌƒRï¿½[ï¿½h:JIS X0401ï¿½AX0402';
+COMMENT ON COLUMN ext.postal_codes_landed.old_zip_code5 IS 'ï¿½ï¿½ï¿½Xï¿½Ö”Ôï¿½(5ï¿½ï¿½)';
+COMMENT ON COLUMN ext.postal_codes_landed.zip_code7 IS 'ï¿½Xï¿½Ö”Ôï¿½(7ï¿½ï¿½)';
+COMMENT ON COLUMN ext.postal_codes_landed.prefecture_katakana IS 'ï¿½sï¿½ï¿½ï¿½{ï¿½ï¿½ï¿½ï¿½(ï¿½Jï¿½i)';
+COMMENT ON COLUMN ext.postal_codes_landed.city_katakana IS 'ï¿½sï¿½æ’¬ï¿½ï¿½ï¿½ï¿½(ï¿½Jï¿½i)';
+COMMENT ON COLUMN ext.postal_codes_landed.town_katakana IS 'ï¿½ï¿½ï¿½æ–¼(ï¿½Jï¿½i)';
+COMMENT ON COLUMN ext.postal_codes_landed.prefecture IS 'ï¿½sï¿½ï¿½ï¿½{ï¿½ï¿½ï¿½ï¿½';
+COMMENT ON COLUMN ext.postal_codes_landed.city IS 'ï¿½sï¿½æ’¬ï¿½ï¿½ï¿½ï¿½';
+COMMENT ON COLUMN ext.postal_codes_landed.town IS 'ï¿½ï¿½ï¿½æ–¼';
+COMMENT ON COLUMN ext.postal_codes_landed.is_multi_zip IS 'ï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½Ö”Ôï¿½ï¿½tï¿½ï¿½ï¿½O:ï¿½ê’¬ï¿½æ‚ªï¿½ï¿½Èï¿½Ì—Xï¿½Ö”Ôï¿½ï¿½Å•\ï¿½ï¿½ï¿½ï¿½ï¿½ê‡ï¿½Ì•\ï¿½ï¿½ï¿½i"1": ï¿½Yï¿½ï¿½ï¿½A"0": ï¿½Yï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½j';
+COMMENT ON COLUMN ext.postal_codes_landed.is_koaza IS 'ï¿½ï¿½ï¿½ï¿½ï¿½Ô’nï¿½tï¿½ï¿½ï¿½O:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É”Ô’nï¿½ï¿½ï¿½Nï¿½Ô‚ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½é’¬ï¿½ï¿½Ì•\ï¿½ï¿½ï¿½i"1": ï¿½Yï¿½ï¿½ï¿½A"0": ï¿½Yï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½j';
+COMMENT ON COLUMN ext.postal_codes_landed.is_chome IS 'ï¿½ï¿½ï¿½Úƒtï¿½ï¿½ï¿½O:ï¿½ï¿½ï¿½Ú‚ï¿½Lï¿½ï¿½ï¿½é’¬ï¿½ï¿½Ìê‡ï¿½Ì•\ï¿½ï¿½ï¿½i"1": ï¿½Yï¿½ï¿½ï¿½A"0": ï¿½Yï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½j';
+COMMENT ON COLUMN ext.postal_codes_landed.is_multi_town IS 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½tï¿½ï¿½ï¿½O:ï¿½ï¿½Â‚Ì—Xï¿½Ö”Ôï¿½ï¿½Å“ï¿½Èï¿½Ì’ï¿½ï¿½ï¿½ï¿½\ï¿½ï¿½ï¿½ê‡ï¿½Ì•\ï¿½ï¿½ï¿½i"1": ï¿½Yï¿½ï¿½ï¿½A"0": ï¿½Yï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½j';
+COMMENT ON COLUMN ext.postal_codes_landed.update_status IS 'ï¿½Xï¿½Vï¿½tï¿½ï¿½ï¿½O:ï¿½Xï¿½Vï¿½Ì•\ï¿½ï¿½ï¿½i"0": ï¿½ÏXï¿½È‚ï¿½ï¿½A"1": ï¿½ÏXï¿½ï¿½ï¿½ï¿½A"2": ï¿½pï¿½~ï¿½j';
+COMMENT ON COLUMN ext.postal_codes_landed.update_reason IS 'ï¿½Xï¿½Vï¿½ï¿½ï¿½R:ï¿½ÏXï¿½ï¿½ï¿½Rï¿½i"0": ï¿½ÏXï¿½È‚ï¿½ï¿½A"1": ï¿½sï¿½ï¿½ï¿½ï¿½ï¿½{ï¿½sï¿½A"2": ï¿½Zï¿½ï¿½ï¿½\ï¿½ï¿½ï¿½Ìï¿½ï¿½{ï¿½A"3": ï¿½ï¿½æ®ï¿½ï¿½ï¿½A"4": ï¿½Xï¿½Ö‹æ’²ï¿½ï¿½ï¿½ï¿½ï¿½A"5": ï¿½ï¿½ï¿½ï¿½ï¿½A"6": ï¿½pï¿½~ï¿½j';
 
