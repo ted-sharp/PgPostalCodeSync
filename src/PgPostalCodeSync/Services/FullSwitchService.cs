@@ -29,8 +29,11 @@ public class FullSwitchService : IFullSwitchService
 
         try
         {
-            var newTableName = "postal_codes_new";
-            var backupTableName = $"postal_codes_old_{DateTime.UtcNow:yyyyMMdd_HHmmss}";
+            await CleanupOldNewTablesAsync(connection, cancellationToken);
+
+            var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
+            var newTableName = $"postal_codes_new_{timestamp}";
+            var backupTableName = $"postal_codes_old_{timestamp}";
 
             result.NewTableName = newTableName;
             result.BackupTableName = backupTableName;
@@ -76,6 +79,7 @@ public class FullSwitchService : IFullSwitchService
             try
             {
                 await CleanupFailedAttemptAsync(connection, result.NewTableName, cancellationToken);
+                await CleanupOldNewTablesAsync(connection, cancellationToken);
             }
             catch (Exception cleanupEx)
             {
@@ -267,14 +271,56 @@ public class FullSwitchService : IFullSwitchService
 
         try
         {
-            await using var dropCommand = new NpgsqlCommand($"DROP TABLE IF EXISTS ext.{newTableName}", connection);
-            await dropCommand.ExecuteNonQueryAsync(cancellationToken);
+            await using var dropTableCommand = new NpgsqlCommand($"DROP TABLE IF EXISTS ext.{newTableName} CASCADE", connection);
+            await dropTableCommand.ExecuteNonQueryAsync(cancellationToken);
             
             _logger.LogInformation("Cleaned up failed attempt table: {TableName}", newTableName);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to cleanup table {TableName}: {Error}", newTableName, ex.Message);
+        }
+    }
+
+    private async Task CleanupOldNewTablesAsync(NpgsqlConnection connection, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var getTablesCommand = """
+                SELECT table_name 
+                FROM information_schema.tables 
+                WHERE table_schema = 'ext' 
+                    AND table_name LIKE 'postal_codes_new_%'
+                ORDER BY table_name DESC
+                """;
+
+            var tableNames = new List<string>();
+            await using var command = new NpgsqlCommand(getTablesCommand, connection);
+            await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+            
+            while (await reader.ReadAsync(cancellationToken))
+            {
+                tableNames.Add(reader.GetString(0));
+            }
+
+            foreach (var tableName in tableNames)
+            {
+                try
+                {
+                    await using var dropCommand = new NpgsqlCommand($"DROP TABLE IF EXISTS ext.{tableName} CASCADE", connection);
+                    await dropCommand.ExecuteNonQueryAsync(cancellationToken);
+                    
+                    _logger.LogInformation("Dropped old new table: {TableName}", tableName);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to drop old new table {TableName}: {Error}", tableName, ex.Message);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to cleanup old new tables: {Error}", ex.Message);
         }
     }
 }
