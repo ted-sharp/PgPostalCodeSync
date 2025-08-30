@@ -21,6 +21,9 @@
 ### 0.3 技術スタック
 - **.NET 9 / C# 13**
 - **PostgreSQL / Npgsql**
+- **依存ライブラリ:**
+  - Aloe.Utils.CommandLine (コマンドライン引数解析)
+  - Serilog (ログ出力)
 - **開発支援:** A5:SQL Mk-2
 - **プラットフォーム:** Windows / Linux クロスプラットフォーム対応
 
@@ -84,10 +87,10 @@
 ## 3. データベース設計
 
 ### 3.1 採用スキーマとテーブル
-- **実行メタ管理:**
-  - `ext.ingestion_runs` - 実行履歴
-  - `ext.ingestion_files` - ファイルメタ情報
-- **データ管理:**
+- **実行メタ管理（オプショナル）:**
+  - `ext.ingestion_runs` - 実行履歴（存在しなくても動作）
+  - `ext.ingestion_files` - ファイルメタ情報（存在しなくても動作）
+- **データ管理（必須）:**
   - `ext.postal_codes_landed` - 着地用（一時テーブル）
   - `ext.postal_codes` - 本番テーブル
 
@@ -111,13 +114,15 @@ CREATE INDEX IF NOT EXISTS ix_postal_codes_comp
 
 ### 4.1 コマンドライン引数
 ```bash
-# 基本実行（前月差分を自動取得）
+# 基本実行（実データ存在チェック → 自動判定）
+# - データなし: フル取り込み（初期化モード）
+# - データあり: 前月差分取り込み
 PostalCodeSync
 
-# 明示的な年月指定
+# 明示的な年月指定（差分モード）
 PostalCodeSync --yymm=2508 --workdir "/var/tmp/postal-sync"
 
-# フル取り込み
+# 強制フル取り込み
 PostalCodeSync --full --workdir "C:\data\postal-sync"
 ```
 
@@ -129,13 +134,13 @@ PostalCodeSync --full --workdir "C:\data\postal-sync"
     "Download": {
       "Utf8Page": "https://www.post.japanpost.jp/zipcode/dl/utf-zip.html",
       "Utf8Readme": "https://www.post.japanpost.jp/zipcode/dl/utf-readme.html",
-      "BaseUrl": "https://www.post.japanpost.jp/zipcode/utf/zip/",
+      "BaseUrl": "https://www.post.japanpost.jp/zipcode/dl/utf/zip/",
       "FullFileName": "utf_ken_all.zip",
-      "FullUrl": "https://www.post.japanpost.jp/zipcode/utf/zip/utf_ken_all.zip",
+      "FullUrl": "https://www.post.japanpost.jp/zipcode/dl/utf/zip/utf_ken_all.zip",
       "AddPattern": "utf_add_{YYMM}.zip",
       "DelPattern": "utf_del_{YYMM}.zip",
-      "AddUrlPattern": "https://www.post.japanpost.jp/zipcode/utf/zip/utf_add_{YYMM}.zip",
-      "DelUrlPattern": "https://www.post.japanpost.jp/zipcode/utf/zip/utf_del_{YYMM}.zip"
+      "AddUrlPattern": "https://www.post.japanpost.jp/zipcode/dl/utf/zip/utf_add_{YYMM}.zip",
+      "DelUrlPattern": "https://www.post.japanpost.jp/zipcode/dl/utf/zip/utf_del_{YYMM}.zip"
     },
     "DefaultYyMmRule": "PreviousMonth",
     "UseTransactionsOnDiff": false,
@@ -178,9 +183,12 @@ PostalCodeSync --full --workdir "C:\data\postal-sync"
 flowchart TB
   A[外部スケジューラ起動<br/>console --yymm=YYMM / --full] --> B{YYMM 指定?}
   B -- あり --> C[指定YYMM]
-  B -- なし --> D[前月YYMMを算出]
+  B -- なし --> D{実データ存在チェック<br/>ext.postal_codes}
+  D -- データなし --> D1[フルモードへ]
+  D -- データあり --> D2[前月YYMMを算出]
   C --> E[ダウンロード対象決定]
-  D --> E
+  D1 --> E
+  D2 --> E
 
   subgraph S1[ファイル取得～着地]
     E --> F{--full ?}
@@ -195,14 +203,14 @@ flowchart TB
     J -- いいえ(差分) --> K[論理キー=(postal_code,prefecture,city,town)]
     K --> L[ADD: upsert into ext.postal_codes<br/>※明示TXなし]
     K --> M[DEL: 複合キー一致 delete<br/>※明示TXなし]
-    L --> N[ingestion_runs/files 記録<br/>version_date=前月1日]
+    L --> N[ingestion_runs/files 記録<br/>version_date=前月1日（テーブルが存在する場合）]
     M --> N
   end
 
   subgraph S3[フルモード]
     J -- はい(フル) --> P[新規テーブル作成→COPY→index→ANALYZE]
     P --> Q[単一トランザクションでリネーム切替]
-    Q --> R[ingestion_runs/files 記録<br/>version_date=前月1日]
+    Q --> R[ingestion_runs/files 記録<br/>version_date=前月1日（テーブルが存在する場合）]
   end
 ```
 
@@ -212,14 +220,14 @@ flowchart TB
 3. **解凍**: WorkDir配下に展開
 4. **着地**: `COPY FROM STDIN`で`postal_codes_landed`に投入
 5. **差分適用**: 非トランザクションでupsert/delete実行
-6. **メタ記録**: 実行結果を`ingestion_runs`に記録
+6. **メタ記録**: 実行結果を`ingestion_runs`に記録（テーブルが存在する場合）
 
 ### 5.3 フルモード詳細
 1. **全件ZIP取得**: `utf_ken_all.zip`を取得・解凍
 2. **新テーブル作成**: `postal_codes_new`を作成してデータ投入
 3. **インデックス作成**: 複合インデックス作成→ANALYZE実行
 4. **瞬時切替**: 単一トランザクションでリネーム
-5. **メタ記録**: 実行結果記録
+5. **メタ記録**: 実行結果記録（テーブルが存在する場合）
 
 ### 5.4 ワークディレクトリ構造
 ```
@@ -404,7 +412,8 @@ COMMIT;
 
 ### 10.4 ログ・メタテスト
 - Serilog出力（Console/Debug/File）非同期ローテーション確認
-- `ingestion_runs/files`必要情報格納確認
+- `ingestion_runs/files`必要情報格納確認（テーブルが存在する場合）
+- ingestion系テーブルなし環境での動作確認
 
 ---
 
@@ -413,7 +422,7 @@ COMMIT;
 | 作業項目 | 工数(h) | 備考 |
 |----------|---------|------|
 | 設計微修正 | 2 | |
-| CLI/引数処理 | 3 | |
+| CLI/引数処理 (Aloe.Utils.CommandLine使用) | 2 | ライブラリ使用で簡略化 |
 | YYMM既定/URLビルダ | 2 | |
 | ダウンロード & SHA-256 検証 | 4 | |
 | ZIP解凍 | 1 | |
@@ -480,14 +489,14 @@ A. 前月の1日（例：2025/09取込 → 2025-08-01）。ダウンロード対
 
 | ファイル名 | 責務 |
 |------------|------|
-| `Program.cs` | エントリポイント、引数解析（--full, --yymm=YYMM, --workdir） |
-| `CliOptions.cs` | 引数検証、YYMM既定処理（未指定時は前月） |
+| `Program.cs` | エントリポイント、引数解析（--full, --yymm=YYMM, --workdir）, Aloe.Utils.CommandLine使用 |
+| `CliOptions.cs` | 引数検証、YYMM既定処理（未指定時はデータ存在チェックで自動判定）, Aloe.Utils.CommandLineと連動 |
 | `Downloader.cs` | 公式UTF-8ページから前月差分（add/del）または最新全件取得 |
 | `ZipExtractor.cs` | ZIP解凍（ワークディレクトリ配下） |
 | `CopyImporter.cs` | `COPY FROM STDIN`で`ext.postal_codes_landed`投入 |
 | `Differ.cs` | 差分処理（add: upsert / del: delete）非トランザクション |
 | `FullSwitch.cs` | フル切替（新規表→索引→ANALYZE→リネームTx） |
-| `MetaRecorder.cs` | `ext.ingestion_runs/files`記録（version_date=前月1日ほか） |
+| `MetaRecorder.cs` | `ext.ingestion_runs/files`記録（version_date=前月1日ほか、テーブル存在チェック付き） |
 
 ---
 

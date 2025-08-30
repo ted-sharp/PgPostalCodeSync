@@ -13,6 +13,9 @@
 - メリット：最新の機能・セキュリティ修正を利用可能
 - リスク：破壊的変更はメジャーバージョンアップ時のみなので、通常問題なし
 
+**使用ライブラリ:**
+- **Aloe.Utils.CommandLine** (コマンドライン引数解析) - 最新: 1.0.4
+
 ### Q: Entity Framework Coreを必須で使用するか？
 **A: 不要（Npgsqlのみで十分）**
 - 理由：COPY FROM STDINは生のNpgsql APIが最適
