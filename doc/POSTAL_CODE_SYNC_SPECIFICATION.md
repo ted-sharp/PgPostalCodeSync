@@ -129,13 +129,13 @@ PostalCodeSync --full --workdir "C:\data\postal-sync"
     "Download": {
       "Utf8Page": "https://www.post.japanpost.jp/zipcode/dl/utf-zip.html",
       "Utf8Readme": "https://www.post.japanpost.jp/zipcode/dl/utf-readme.html",
-      "BaseUrl": "https://www.post.japanpost.jp/zipcode/utf/zip/",
+      "BaseUrl": "https://www.post.japanpost.jp/zipcode/dl/utf/zip/",
       "FullFileName": "utf_ken_all.zip",
-      "FullUrl": "https://www.post.japanpost.jp/zipcode/utf/zip/utf_ken_all.zip",
+      "FullUrl": "https://www.post.japanpost.jp/zipcode/dl/utf/zip/utf_ken_all.zip",
       "AddPattern": "utf_add_{YYMM}.zip",
       "DelPattern": "utf_del_{YYMM}.zip",
-      "AddUrlPattern": "https://www.post.japanpost.jp/zipcode/utf/zip/utf_add_{YYMM}.zip",
-      "DelUrlPattern": "https://www.post.japanpost.jp/zipcode/utf/zip/utf_del_{YYMM}.zip"
+      "AddUrlPattern": "https://www.post.japanpost.jp/zipcode/dl/utf/zip/utf_add_{YYMM}.zip",
+      "DelUrlPattern": "https://www.post.japanpost.jp/zipcode/dl/utf/zip/utf_del_{YYMM}.zip"
     },
     "DefaultYyMmRule": "PreviousMonth",
     "UseTransactionsOnDiff": false,
