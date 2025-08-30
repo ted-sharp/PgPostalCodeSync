@@ -69,7 +69,7 @@ public class CopyImportService : ICopyImportService
             )
             """;
 
-        await using var writer = await connection.BeginBinaryImportAsync(copyCommand, cancellationToken);
+        await using var writer = await connection.BeginTextImportAsync(copyCommand, cancellationToken);
         long rowCount = 0;
 
         try
@@ -84,35 +84,11 @@ public class CopyImportService : ICopyImportService
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var record = ParseCsvLine(line);
-                if (record == null)
-                {
-                    _logger.LogWarning("Failed to parse CSV line, skipping: {Line}", line);
-                    continue;
-                }
-
-                await writer.StartRowAsync(cancellationToken);
-                
-                await writer.WriteAsync(record.LocalGovernmentCode, cancellationToken);
-                await writer.WriteAsync(record.OldZipCode5, cancellationToken);
-                await writer.WriteAsync(record.ZipCode7, cancellationToken);
-                await writer.WriteAsync(record.PrefectureKatakana, cancellationToken);
-                await writer.WriteAsync(record.CityKatakana, cancellationToken);
-                await writer.WriteAsync(record.TownKatakana, cancellationToken);
-                await writer.WriteAsync(record.Prefecture, cancellationToken);
-                await writer.WriteAsync(record.City, cancellationToken);
-                await writer.WriteAsync(record.Town, cancellationToken);
-                await writer.WriteAsync(record.IsMultiZip, cancellationToken);
-                await writer.WriteAsync(record.IsKoaza, cancellationToken);
-                await writer.WriteAsync(record.IsChome, cancellationToken);
-                await writer.WriteAsync(record.IsMultiTown, cancellationToken);
-                await writer.WriteAsync(record.UpdateStatus, cancellationToken);
-                await writer.WriteAsync(record.UpdateReason, cancellationToken);
-                
+                await writer.WriteLineAsync(line.AsMemory(), cancellationToken);
                 rowCount++;
             }
 
-            await writer.CompleteAsync(cancellationToken);
+            await writer.DisposeAsync();
             return rowCount;
         }
         catch (Exception ex)
@@ -135,75 +111,4 @@ public class CopyImportService : ICopyImportService
         _logger.LogInformation("Landed table truncated successfully");
     }
 
-    private static PostalCodeRecord? ParseCsvLine(string line)
-    {
-        try
-        {
-            var fields = ParseCsvFields(line);
-            
-            if (fields.Length < 15)
-                return null;
-
-            return new PostalCodeRecord
-            {
-                LocalGovernmentCode = fields[0],
-                OldZipCode5 = fields[1],
-                ZipCode7 = fields[2],
-                PrefectureKatakana = fields[3],
-                CityKatakana = fields[4],
-                TownKatakana = fields[5],
-                Prefecture = fields[6],
-                City = fields[7],
-                Town = fields[8],
-                IsMultiZip = fields[9] == "1",
-                IsKoaza = fields[10] == "1",
-                IsChome = fields[11] == "1",
-                IsMultiTown = fields[12] == "1",
-                UpdateStatus = fields[13],
-                UpdateReason = fields[14]
-            };
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
-    private static string[] ParseCsvFields(string line)
-    {
-        var fields = new List<string>();
-        var current = new StringBuilder();
-        var inQuotes = false;
-        var i = 0;
-
-        while (i < line.Length)
-        {
-            var c = line[i];
-
-            if (c == '"')
-            {
-                if (inQuotes && i + 1 < line.Length && line[i + 1] == '"')
-                {
-                    current.Append('"');
-                    i += 2;
-                    continue;
-                }
-                inQuotes = !inQuotes;
-            }
-            else if (c == ',' && !inQuotes)
-            {
-                fields.Add(current.ToString());
-                current.Clear();
-            }
-            else
-            {
-                current.Append(c);
-            }
-
-            i++;
-        }
-
-        fields.Add(current.ToString());
-        return fields.ToArray();
-    }
 }

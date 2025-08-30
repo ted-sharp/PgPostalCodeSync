@@ -51,12 +51,18 @@ public class DownloadService : IDownloadService
             }
 
             var totalBytes = response.Content.Headers.ContentLength ?? 0;
-            using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+            long actualSize;
+            string hash;
             
-            await using var fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write, FileShare.None);
-            await contentStream.CopyToAsync(fileStream, cancellationToken);
+            using (var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken))
+            {
+                await using var fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write, FileShare.None);
+                await contentStream.CopyToAsync(fileStream, cancellationToken);
+                await fileStream.FlushAsync(cancellationToken);
+            }
             
-            var actualSize = new FileInfo(destinationPath).Length;
+            // File streams are now properly disposed, safe to access file
+            actualSize = new FileInfo(destinationPath).Length;
             
             if (actualSize == 0)
             {
@@ -73,7 +79,7 @@ public class DownloadService : IDownloadService
                 };
             }
 
-            var hash = await ComputeFileHashAsync(destinationPath, cancellationToken);
+            hash = await ComputeFileHashAsync(destinationPath, cancellationToken);
             var finishedAt = DateTime.UtcNow;
 
             _logger.LogInformation("Download completed: {Url} -> {Size} bytes, SHA256: {Hash}, Duration: {Duration}ms", 
@@ -138,7 +144,7 @@ public class DownloadService : IDownloadService
     private static async Task<string> ComputeFileHashAsync(string filePath, CancellationToken cancellationToken = default)
     {
         using var sha256 = SHA256.Create();
-        await using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+        using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
         var hashBytes = await sha256.ComputeHashAsync(stream, cancellationToken);
         return Convert.ToHexString(hashBytes).ToLowerInvariant();
     }
