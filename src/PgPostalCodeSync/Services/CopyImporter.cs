@@ -115,7 +115,7 @@ public class CopyImporter
                     copyWriter.WriteLine(copyLine);
                     recordCount++;
 
-                    if (recordCount % 10000 == 0)
+                    if (recordCount % _options.Processing.BatchSize == 0)
                     {
                         _logger.LogDebug("処理済みレコード数: {RecordCount}", recordCount);
                     }
@@ -125,9 +125,9 @@ public class CopyImporter
                     errorCount++;
                     _logger.LogWarning("行の処理に失敗しました (行 {LineNumber}): {Error}", recordCount + errorCount, ex.Message);
 
-                    if (errorCount > 100)
+                    if (errorCount > _options.Processing.MaxErrorCount)
                     {
-                        _logger.LogError("エラーが100件を超えたため、処理を中断します");
+                        _logger.LogError("エラーが{MaxErrorCount}件を超えたため、処理を中断します", _options.Processing.MaxErrorCount);
                         break;
                     }
                 }

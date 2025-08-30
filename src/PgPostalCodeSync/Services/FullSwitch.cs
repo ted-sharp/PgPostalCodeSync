@@ -184,7 +184,7 @@ public class FullSwitch
                     copyWriter.WriteLine(copyLine);
                     recordCount++;
 
-                    if (recordCount % 10000 == 0)
+                    if (recordCount % _options.Processing.BatchSize == 0)
                     {
                         _logger.LogDebug("処理済みレコード数: {RecordCount}", recordCount);
                     }
@@ -337,7 +337,7 @@ public class FullSwitch
                 WHERE schemaname = 'ext'
                   AND tablename LIKE 'postal_codes_old_%'
                 ORDER BY tablename DESC
-                OFFSET 3;";
+                OFFSET " + _options.CleanupPolicy.KeepOldBackupTables + ";";
 
             List<string> tablesToDrop;
             using (var command = new NpgsqlCommand(cleanupSql, connection))

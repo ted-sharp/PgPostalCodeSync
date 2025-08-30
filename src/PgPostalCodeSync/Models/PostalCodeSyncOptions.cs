@@ -9,6 +9,7 @@ public class PostalCodeSyncOptions
     public string DefaultYyMmRule { get; set; } = "PreviousMonth";
     public bool UseTransactionsOnDiff { get; set; } = false;
     public string VersionDatePolicy { get; set; } = "FirstDayOfPreviousMonth";
+    public ProcessingOptions Processing { get; set; } = new();
     public CleanupPolicyOptions CleanupPolicy { get; set; } = new();
 }
 
@@ -31,4 +32,10 @@ public class CleanupPolicyOptions
     public bool DeleteDownloadedFiles { get; set; } = false;
     public bool DeleteExtractedFiles { get; set; } = true;
     public int KeepOldBackupTables { get; set; } = 3;
+}
+
+public class ProcessingOptions
+{
+    public int BatchSize { get; set; } = 10000;
+    public int MaxErrorCount { get; set; } = 100;
 }
