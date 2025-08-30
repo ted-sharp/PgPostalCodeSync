@@ -136,4 +136,3 @@ COMMENT ON COLUMN ext.postal_codes_landed.is_chome IS '丁目フラグ:丁目を有する町
 COMMENT ON COLUMN ext.postal_codes_landed.is_multi_town IS '複数町域フラグ:一つの郵便番号で二以上の町域を表す場合の表示（"1": 該当、"0": 該当せず）';
 COMMENT ON COLUMN ext.postal_codes_landed.update_status IS '更新フラグ:更新の表示（"0": 変更なし、"1": 変更あり、"2": 廃止）';
 COMMENT ON COLUMN ext.postal_codes_landed.update_reason IS '更新理由:変更理由（"0": 変更なし、"1": 市政等施行、"2": 住居表示の実施、"3": 区画整理、"4": 郵便区調整等、"5": 訂正、"6": 廃止）';
-

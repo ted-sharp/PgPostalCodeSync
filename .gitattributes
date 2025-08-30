@@ -211,4 +211,3 @@ Procfile text
 .yarnrc text eol=lf
 
 *.lock text eol=lf
-

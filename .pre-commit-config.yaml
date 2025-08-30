@@ -1,23 +1,24 @@
-# Pre-commit configuration for VOICEVOX Run Cached project
+# Pre-commit configuration for PgPostalCodeSync project
 repos:
   - repo: local
     hooks:
       - id: dotnet-build
         name: Build C# project
-        entry: bash -c "cd src_dotnet/VoicevoxRunCached && dotnet build --verbosity quiet"
+        entry: powershell -Command "Set-Location src/PgPostalCodeSync; dotnet build --verbosity quiet"
         language: system
         pass_filenames: false
         always_run: true
-        
+
       - id: dotnet-format
         name: Format C# code
-        entry: bash -c "cd src_dotnet/VoicevoxRunCached && dotnet format --verbosity quiet"
+        entry: powershell -Command "Set-Location src/PgPostalCodeSync; dotnet format . --verbosity quiet"
         language: system
         files: '\.cs$'
-        
+        pass_filenames: false
+
       - id: dotnet-test
         name: Run C# tests
-        entry: bash -c "cd src_dotnet/VoicevoxRunCached && if find . -name '*.Tests.csproj' -o -name '*Test*.csproj' | grep -q .; then dotnet test --verbosity quiet; else echo 'No test projects found'; fi"
+        entry: powershell -Command "Set-Location src/PgPostalCodeSync; if (Get-ChildItem -Name '*.Tests.csproj', '*Test*.csproj') { dotnet test --verbosity quiet } else { Write-Host 'No test projects found' }"
         language: system
         pass_filenames: false
         always_run: true
