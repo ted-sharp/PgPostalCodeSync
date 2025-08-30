@@ -7,6 +7,7 @@ public class CliOptions
     public bool Full { get; set; }
     public string? YyMm { get; set; }
     public string? WorkDir { get; set; }
+    public bool Force { get; set; }
     
     public static RootCommand CreateRootCommand()
     {
@@ -23,10 +24,15 @@ public class CliOptions
         var workdirOption = new Option<string?>(
             ["--workdir"],
             description: "Specify work directory path. If omitted, uses value from appsettings.json.");
+            
+        var forceOption = new Option<bool>(
+            ["--force"],
+            description: "Force execution even if the same version and mode has already been successfully processed");
         
         rootCommand.AddOption(fullOption);
         rootCommand.AddOption(yymmOption);
         rootCommand.AddOption(workdirOption);
+        rootCommand.AddOption(forceOption);
         
         return rootCommand;
     }
@@ -36,15 +42,17 @@ public class CliOptions
         var options = new CliOptions();
         var rootCommand = CreateRootCommand();
         
-        rootCommand.SetHandler((bool full, string? yymm, string? workdir) =>
+        rootCommand.SetHandler((bool full, string? yymm, string? workdir, bool force) =>
         {
             options.Full = full;
             options.YyMm = yymm;
             options.WorkDir = workdir;
+            options.Force = force;
         }, 
-        rootCommand.Options.OfType<Option<bool>>().First(),
+        rootCommand.Options.OfType<Option<bool>>().First(o => o.Name == "full"),
         rootCommand.Options.OfType<Option<string?>>().First(o => o.Name == "yymm"),
-        rootCommand.Options.OfType<Option<string?>>().First(o => o.Name == "workdir"));
+        rootCommand.Options.OfType<Option<string?>>().First(o => o.Name == "workdir"),
+        rootCommand.Options.OfType<Option<bool>>().First(o => o.Name == "force"));
         
         rootCommand.Invoke(args);
         return options;

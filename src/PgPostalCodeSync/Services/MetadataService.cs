@@ -11,6 +11,9 @@ public interface IMetadataService
     Task UpdateIngestionRunAsync(string connectionString, long runId, string status, long landedRows, string? notes = null, object? errors = null, CancellationToken cancellationToken = default);
     Task CreateIngestionFilesAsync(string connectionString, long runId, DownloadResult[] downloadResults, CancellationToken cancellationToken = default);
     Task<IngestionRun?> GetLatestSuccessfulRunAsync(string connectionString, CancellationToken cancellationToken = default);
+    Task<IngestionRun?> GetSuccessfulRunAsync(string connectionString, DateTime versionDate, string mode, CancellationToken cancellationToken = default);
+    Task<bool> HasValidDataAsync(string connectionString, DateTime versionDate, CancellationToken cancellationToken = default);
+    Task<bool> HasAnyDataAsync(string connectionString, CancellationToken cancellationToken = default);
 }
 
 public class MetadataService : IMetadataService
@@ -148,6 +151,79 @@ public class MetadataService : IMetadataService
             LandedRows = reader.GetInt64(7),
             Notes = reader.GetString(8)
         };
+    }
+
+    public async Task<IngestionRun?> GetSuccessfulRunAsync(string connectionString, DateTime versionDate, string mode, CancellationToken cancellationToken = default)
+    {
+        const string selectCommand = """
+            SELECT run_id, source_system, version_date, mode, started_at, finished_at, status, landed_rows, notes
+            FROM ext.ingestion_runs
+            WHERE status = 'Succeeded'
+              AND version_date = @versionDate
+              AND mode = @mode
+            ORDER BY finished_at DESC
+            LIMIT 1
+            """;
+
+        await using var connection = new NpgsqlConnection(connectionString);
+        await connection.OpenAsync(cancellationToken);
+
+        await using var command = new NpgsqlCommand(selectCommand, connection);
+        command.Parameters.AddWithValue("@versionDate", versionDate);
+        command.Parameters.AddWithValue("@mode", mode);
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+
+        if (!await reader.ReadAsync(cancellationToken))
+            return null;
+
+        return new IngestionRun
+        {
+            RunId = reader.GetInt64(0),
+            SourceSystem = reader.GetString(1),
+            VersionDate = reader.GetDateTime(2),
+            Mode = reader.GetString(3),
+            StartedAt = reader.GetDateTime(4),
+            FinishedAt = reader.IsDBNull(5) ? null : reader.GetDateTime(5),
+            Status = reader.GetString(6),
+            LandedRows = reader.GetInt64(7),
+            Notes = reader.GetString(8)
+        };
+    }
+
+    public async Task<bool> HasValidDataAsync(string connectionString, DateTime versionDate, CancellationToken cancellationToken = default)
+    {
+        const string countCommand = """
+            SELECT COUNT(*) 
+            FROM ext.postal_codes p
+            JOIN ext.ingestion_runs r ON p.run_id = r.run_id
+            WHERE r.version_date = @versionDate
+              AND r.status = 'Succeeded'
+            """;
+
+        await using var connection = new NpgsqlConnection(connectionString);
+        await connection.OpenAsync(cancellationToken);
+
+        await using var command = new NpgsqlCommand(countCommand, connection);
+        command.Parameters.AddWithValue("@versionDate", versionDate);
+        
+        var count = (long)(await command.ExecuteScalarAsync(cancellationToken))!;
+        return count > 0;
+    }
+
+    public async Task<bool> HasAnyDataAsync(string connectionString, CancellationToken cancellationToken = default)
+    {
+        const string countCommand = """
+            SELECT COUNT(*) 
+            FROM ext.postal_codes
+            """;
+
+        await using var connection = new NpgsqlConnection(connectionString);
+        await connection.OpenAsync(cancellationToken);
+
+        await using var command = new NpgsqlCommand(countCommand, connection);
+        
+        var count = (long)(await command.ExecuteScalarAsync(cancellationToken))!;
+        return count > 0;
     }
 }
 

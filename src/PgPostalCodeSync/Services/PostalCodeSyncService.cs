@@ -47,10 +47,66 @@ public class PostalCodeSyncService : IPostalCodeSyncService
         var workDir = options.WorkDir ?? _config.WorkDir;
         var yymm = options.ResolveYyMm();
         var versionDate = options.ResolveVersionDate();
-        var mode = options.Full ? "Full" : "Differential";
+        var requestedMode = options.Full ? "Full" : "Differential";
+        
+        // Auto-full mode: if differential requested but no data exists, switch to full
+        var hasAnyData = await _metadataService.HasAnyDataAsync(_connectionString, cancellationToken);
+        var actualMode = requestedMode;
+        var autoSwitchedToFull = false;
+        
+        if (requestedMode == "Differential" && !hasAnyData)
+        {
+            actualMode = "Full";
+            autoSwitchedToFull = true;
+            _logger.LogInformation("Auto-switching to Full mode: no existing data found in postal_codes table");
+        }
 
-        _logger.LogInformation("Starting PostalCodeSync - Mode: {Mode}, YYMM: {YyMm}, WorkDir: {WorkDir}", 
-            mode, yymm, workDir);
+        _logger.LogInformation("Starting PostalCodeSync - Mode: {Mode}{AutoSwitch}, YYMM: {YyMm}, WorkDir: {WorkDir}, Force: {Force}", 
+            actualMode, autoSwitchedToFull ? " (auto-switched from Differential)" : "", yymm, workDir, options.Force);
+
+        if (!options.Force)
+        {
+            var existingRun = await _metadataService.GetSuccessfulRunAsync(_connectionString, versionDate, actualMode, cancellationToken);
+            
+            // For Full mode: check if specific version data exists
+            // For Differential mode: just check if the same version+mode was already processed
+            bool shouldSkip = false;
+            if (existingRun != null)
+            {
+                if (actualMode == "Full")
+                {
+                    var hasValidData = await _metadataService.HasValidDataAsync(_connectionString, versionDate, cancellationToken);
+                    shouldSkip = hasValidData;
+                }
+                else // Differential mode
+                {
+                    // For differential, if we already processed this YYMM successfully, skip it
+                    shouldSkip = true;
+                }
+            }
+            
+            if (shouldSkip)
+            {
+                _logger.LogInformation("Skipping execution: same version and mode already successfully processed on {FinishedAt} (Run ID: {RunId}). Use --force to override.",
+                    existingRun!.FinishedAt, existingRun.RunId);
+                
+                // Create a skip record for audit trail
+                var skipRunId = await _metadataService.CreateIngestionRunAsync(
+                    _connectionString, "JapanPost", versionDate, actualMode, cancellationToken);
+                await _metadataService.UpdateIngestionRunAsync(
+                    _connectionString, skipRunId, "Skipped", 0, 
+                    $"Execution skipped - already processed successfully by Run ID {existingRun.RunId} on {existingRun.FinishedAt}", 
+                    null, cancellationToken);
+                
+                _logger.LogInformation("PgPostalCodeSync execution completed - Success: True (Skipped)");
+                return true;
+            }
+            else if (existingRun != null && actualMode == "Full")
+            {
+                _logger.LogWarning("Found successful run metadata (Run ID: {RunId}) but no valid data present. Proceeding with execution.", 
+                    existingRun.RunId);
+            }
+        }
 
         Directory.CreateDirectory(workDir);
         Directory.CreateDirectory(Path.Combine(workDir, "downloads"));
@@ -61,9 +117,9 @@ public class PostalCodeSyncService : IPostalCodeSyncService
         try
         {
             runId = await _metadataService.CreateIngestionRunAsync(
-                _connectionString, "JapanPost", versionDate, mode, cancellationToken);
+                _connectionString, "JapanPost", versionDate, actualMode, cancellationToken);
 
-            if (options.Full)
+            if (actualMode == "Full")
             {
                 return await ExecuteFullModeAsync(workDir, runId, cancellationToken);
             }

@@ -48,6 +48,22 @@
         "DOTNET_ENVIRONMENT": "Development",
         "Serilog__MinimumLevel": "Debug"
       }
+    },
+    "Force Full Import": {
+      "commandName": "Project",
+      "commandLineArgs": "--full --force --workdir \"C:\\temp\\postal-debug\"",
+      "workingDirectory": ".",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "Force Differential": {
+      "commandName": "Project",
+      "commandLineArgs": "--yymm 2508 --force --workdir \"C:\\temp\\postal-debug\"",
+      "workingDirectory": ".",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
     }
   }
 }
