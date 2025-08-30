@@ -58,7 +58,7 @@ public class CliOptions
         return options;
     }
     
-    public string ResolveYyMm()
+    public string ResolveYyMm(DateTime? currentTime = null)
     {
         if (!string.IsNullOrEmpty(YyMm))
         {
@@ -67,15 +67,16 @@ public class CliOptions
             return YyMm;
         }
         
-        var previousMonth = DateTime.Now.AddMonths(-1);
+        var baseTime = currentTime ?? DateTime.Now;
+        var previousMonth = baseTime.AddMonths(-1);
         var yy = previousMonth.Year % 100;
         var mm = previousMonth.Month;
         return $"{yy:D2}{mm:D2}";
     }
     
-    public DateTime ResolveVersionDate()
+    public DateTime ResolveVersionDate(DateTime? currentTime = null)
     {
-        var yymmStr = ResolveYyMm();
+        var yymmStr = ResolveYyMm(currentTime);
         var yy = int.Parse(yymmStr.Substring(0, 2));
         var mm = int.Parse(yymmStr.Substring(2, 2));
         var year = yy < 50 ? 2000 + yy : 1900 + yy;

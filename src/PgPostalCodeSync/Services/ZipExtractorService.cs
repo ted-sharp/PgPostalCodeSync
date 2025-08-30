@@ -32,9 +32,9 @@ public class ZipExtractorService : IZipExtractorService
         try
         {
             var extractedFiles = new List<string>();
-            
+
             using var archive = ZipFile.OpenRead(zipFilePath);
-            
+
             foreach (var entry in archive.Entries)
             {
                 if (string.IsNullOrEmpty(entry.Name))
@@ -43,16 +43,16 @@ public class ZipExtractorService : IZipExtractorService
                 cancellationToken.ThrowIfCancellationRequested();
 
                 var extractPath = Path.Combine(extractDir, entry.Name);
-                
+
                 Directory.CreateDirectory(Path.GetDirectoryName(extractPath)!);
-                
+
                 _logger.LogDebug("Extracting entry: {EntryName} -> {ExtractPath}", entry.Name, extractPath);
-                
+
                 entry.ExtractToFile(extractPath, overwrite: true);
                 extractedFiles.Add(extractPath);
             }
 
-            _logger.LogInformation("ZIP extraction completed: {ZipFile} -> {FileCount} files extracted", 
+            _logger.LogInformation("ZIP extraction completed: {ZipFile} -> {FileCount} files extracted",
                 zipFilePath, extractedFiles.Count);
 
             return Task.FromResult(extractedFiles.ToArray());
