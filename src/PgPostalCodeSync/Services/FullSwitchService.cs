@@ -31,7 +31,7 @@ public class FullSwitchService : IFullSwitchService
         {
             await CleanupOldNewTablesAsync(connection, cancellationToken);
 
-            var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
+            var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             var newTableName = $"postal_codes_new_{timestamp}";
             var backupTableName = $"postal_codes_old_{timestamp}";
 
