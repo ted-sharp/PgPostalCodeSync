@@ -92,7 +92,7 @@ public class Differ
                 MERGE INTO ext.postal_codes AS t
                 USING (
                     SELECT
-                        l.zip_code7 AS postal_code,
+                        l.postal_code,
                         l.local_government_code,
                         l.old_zip_code5,
                         l.prefecture_katakana, l.city_katakana, l.town_katakana,
@@ -181,7 +181,7 @@ public class Differ
                 DELETE FROM ext.postal_codes t
                 USING (
                     SELECT
-                        l.zip_code7 AS postal_code,
+                        l.postal_code,
                         l.prefecture, l.city, l.town
                     FROM ext.postal_codes_landed l
                 ) AS d
@@ -215,7 +215,7 @@ public class Differ
             SELECT COUNT(*) FROM ext.postal_codes_landed l
             WHERE NOT EXISTS (
                 SELECT 1 FROM ext.postal_codes t
-                WHERE t.postal_code = l.zip_code7
+                WHERE t.postal_code = l.postal_code
                   AND t.prefecture = l.prefecture
                   AND t.city = l.city
                   AND t.town = l.town
@@ -232,7 +232,7 @@ public class Differ
             SELECT COUNT(*) FROM ext.postal_codes_landed l
             WHERE EXISTS (
                 SELECT 1 FROM ext.postal_codes t
-                WHERE t.postal_code = l.zip_code7
+                WHERE t.postal_code = l.postal_code
                   AND t.prefecture = l.prefecture
                   AND t.city = l.city
                   AND t.town = l.town
@@ -249,7 +249,7 @@ public class Differ
             SELECT COUNT(*) FROM ext.postal_codes t
             WHERE EXISTS (
                 SELECT 1 FROM ext.postal_codes_landed l
-                WHERE l.zip_code7 = t.postal_code
+                WHERE l.postal_code = t.postal_code
                   AND l.prefecture = t.prefecture
                   AND l.city = t.city
                   AND l.town = t.town

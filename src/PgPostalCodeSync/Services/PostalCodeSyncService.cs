@@ -221,7 +221,7 @@ public class PostalCodeSyncService
         }
     }
 
-    private async Task CleanupAfterProcessingAsync(string workDir, bool isFullMode)
+    private Task CleanupAfterProcessingAsync(string workDir, bool isFullMode)
     {
         try
         {
@@ -257,5 +257,7 @@ public class PostalCodeSyncService
         {
             _logger.LogWarning(ex, "クリーンアップ中にエラーが発生しました");
         }
+
+        return Task.CompletedTask;
     }
 }

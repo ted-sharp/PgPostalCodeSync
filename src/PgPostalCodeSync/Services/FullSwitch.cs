@@ -139,10 +139,10 @@ public class FullSwitch
             ) FROM STDIN WITH (
                 FORMAT CSV,
                 DELIMITER ',',
-                QUOTE " + "\"" + @",
-                ESCAPE " + "\"" + @",
                 ENCODING 'UTF8'
             )";
+
+            _logger.LogDebug("実行するCOPY SQL: {CopySql}", copySql);
 
             using var copyWriter = connection.BeginTextImport(copySql);
             using var reader = new StreamReader(csvFilePath, System.Text.Encoding.UTF8);

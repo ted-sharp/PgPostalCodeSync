@@ -190,22 +190,22 @@ public class Downloader
         return Convert.ToHexString(hash).ToLowerInvariant();
     }
 
-    private async Task<string?> GetExpectedSha256Async(string fileName)
+    private Task<string?> GetExpectedSha256Async(string fileName)
     {
         try
         {
             // 実際の運用では、郵便局の公式ページからハッシュ値を取得する
             // ここでは簡易実装としてnullを返す
-            return null;
+            return Task.FromResult<string?>(null);
         }
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "SHA-256ハッシュ値の取得に失敗しました");
-            return null;
+            return Task.FromResult<string?>(null);
         }
     }
 
-    private async Task<ExtractResult> ExtractZipAsync(string zipPath, string extractPath)
+    private Task<ExtractResult> ExtractZipAsync(string zipPath, string extractPath)
     {
         try
         {
@@ -215,13 +215,13 @@ public class Downloader
 
             _logger.LogInformation("ZIPファイルの解凍が完了しました: {ExtractPath}", extractPath);
 
-            return new ExtractResult { Success = true, ExtractedDirectory = extractPath };
+            return Task.FromResult(new ExtractResult { Success = true, ExtractedDirectory = extractPath });
         }
         catch (Exception ex)
         {
             var error = $"ZIPファイルの解凍に失敗しました: {ex.Message}";
             _logger.LogError(ex, error);
-            return new ExtractResult { Success = false, Error = error };
+            return Task.FromResult(new ExtractResult { Success = false, Error = error });
         }
     }
 }

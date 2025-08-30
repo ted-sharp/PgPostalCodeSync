@@ -198,7 +198,7 @@ public class MetaRecorder
         }
     }
 
-    public async Task<string> GenerateSummaryAsync(string mode, string? yymm,
+    public Task<string> GenerateSummaryAsync(string mode, string? yymm,
         int? totalRecords = null, int? addedRecords = null, int? updatedRecords = null, int? deletedRecords = null)
     {
         var summary = new
@@ -215,7 +215,7 @@ public class MetaRecorder
             }
         };
 
-        return JsonSerializer.Serialize(summary, new JsonSerializerOptions { WriteIndented = true });
+        return Task.FromResult(JsonSerializer.Serialize(summary, new JsonSerializerOptions { WriteIndented = true }));
     }
 
     public async Task<bool> EnsureTablesExistAsync(string connectionString)
