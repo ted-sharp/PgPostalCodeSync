@@ -1,0 +1,53 @@
+{
+  "profiles": {
+    "Default": {
+      "commandName": "Project",
+      "commandLineArgs": "",
+      "workingDirectory": ".",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "Full Import": {
+      "commandName": "Project",
+      "commandLineArgs": "--full --workdir \"C:\\temp\\postal-debug\"",
+      "workingDirectory": ".",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "Differential Import": {
+      "commandName": "Project",
+      "commandLineArgs": "--yymm 2508 --workdir \"C:\\temp\\postal-debug\"",
+      "workingDirectory": ".",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "Custom Month Full": {
+      "commandName": "Project",
+      "commandLineArgs": "--full --yymm 2507 --workdir \"C:\\temp\\postal-debug\"",
+      "workingDirectory": ".",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "Help": {
+      "commandName": "Project",
+      "commandLineArgs": "--help",
+      "workingDirectory": ".",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "Debug Logging": {
+      "commandName": "Project",
+      "commandLineArgs": "--full --workdir \"C:\\temp\\postal-debug\"",
+      "workingDirectory": ".",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "Serilog__MinimumLevel": "Debug"
+      }
+    }
+  }
+}
