@@ -87,18 +87,24 @@ public class FullSwitch
         {
             _logger.LogInformation("新規テーブルの作成を開始します");
 
+            // 既存のテーブルを削除（存在する場合）
+            var dropTableSql = "DROP TABLE IF EXISTS ext.postal_codes_new CASCADE;";
+            using var dropCommand = new NpgsqlCommand(dropTableSql, connection);
+            await dropCommand.ExecuteNonQueryAsync();
+
+            // 既存のpostal_codesテーブルと同じスキーマで新規テーブルを作成
             var createTableSql = @"
                 CREATE TABLE ext.postal_codes_new (
                     id SERIAL PRIMARY KEY,
                     postal_code VARCHAR(7) NOT NULL,
                     local_government_code VARCHAR(6) NOT NULL,
                     old_zip_code5 VARCHAR(5) NOT NULL,
-                    prefecture_katakana VARCHAR(50) NOT NULL,
-                    city_katakana VARCHAR(50) NOT NULL,
-                    town_katakana VARCHAR(50) NOT NULL,
-                    prefecture VARCHAR(50) NOT NULL,
-                    city VARCHAR(50) NOT NULL,
-                    town VARCHAR(50) NOT NULL,
+                    prefecture_katakana VARCHAR(100) NOT NULL,
+                    city_katakana VARCHAR(100) NOT NULL,
+                    town_katakana TEXT NOT NULL,
+                    prefecture VARCHAR(100) NOT NULL,
+                    city VARCHAR(100) NOT NULL,
+                    town TEXT NOT NULL,
                     is_multi_zip BOOLEAN NOT NULL,
                     is_koaza BOOLEAN NOT NULL,
                     is_chome BOOLEAN NOT NULL,
@@ -318,6 +324,14 @@ public class FullSwitch
         {
             _logger.LogInformation("古いバックアップテーブルのクリーンアップを開始します");
 
+            // 現在のコネクションの状態を確認
+            if (connection.State != System.Data.ConnectionState.Open)
+            {
+                _logger.LogWarning("コネクションが開いていません。バックアップテーブルのクリーンアップをスキップします");
+                return;
+            }
+
+            // 古いバックアップテーブルの一覧を取得
             var cleanupSql = @"
                 SELECT tablename FROM pg_tables
                 WHERE schemaname = 'ext'
@@ -325,22 +339,37 @@ public class FullSwitch
                 ORDER BY tablename DESC
                 OFFSET 3;";
 
-            using var command = new NpgsqlCommand(cleanupSql, connection);
-            using var reader = await command.ExecuteReaderAsync();
-
-            var tablesToDrop = new List<string>();
-            while (await reader.ReadAsync())
+            List<string> tablesToDrop;
+            using (var command = new NpgsqlCommand(cleanupSql, connection))
+            using (var reader = await command.ExecuteReaderAsync())
             {
-                tablesToDrop.Add(reader.GetString(0));
+                tablesToDrop = new List<string>();
+                while (await reader.ReadAsync())
+                {
+                    tablesToDrop.Add(reader.GetString(0));
+                }
             }
 
+            // バックアップテーブルが存在しない場合は処理をスキップ
+            if (tablesToDrop.Count == 0)
+            {
+                _logger.LogInformation("削除対象の古いバックアップテーブルが存在しません");
+                return;
+            }
+
+            // 各テーブルを個別のコネクションで削除
             foreach (var tableName in tablesToDrop)
             {
                 try
                 {
-                    var dropSql = $"DROP TABLE ext.{tableName}";
-                    using var dropCommand = new NpgsqlCommand(dropSql, connection);
+                    // 新しいコネクションを使用してテーブルを削除
+                    using var cleanupConnection = new NpgsqlConnection(connection.ConnectionString);
+                    await cleanupConnection.OpenAsync();
+
+                    var dropSql = $"DROP TABLE IF EXISTS ext.{tableName} CASCADE";
+                    using var dropCommand = new NpgsqlCommand(dropSql, cleanupConnection);
                     await dropCommand.ExecuteNonQueryAsync();
+
                     _logger.LogInformation("古いバックアップテーブルを削除しました: {TableName}", tableName);
                 }
                 catch (Exception ex)

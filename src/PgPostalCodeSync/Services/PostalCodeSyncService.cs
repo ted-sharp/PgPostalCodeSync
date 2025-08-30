@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PgPostalCodeSync.Models;
+using Npgsql;
 
 namespace PgPostalCodeSync.Services;
 
@@ -67,6 +68,13 @@ public class PostalCodeSyncService
             }
             else
             {
+                // 差分モードの場合、まずデータベースにデータが存在するかチェック
+                if (!await HasDataInDatabaseAsync(connectionString))
+                {
+                    _logger.LogInformation("データベースに郵便番号データが存在しません。フル取り込みモードに切り替えます。");
+                    return await ExecuteFullModeAsync(ingestionRun, workDir, connectionString);
+                }
+
                 return await ExecuteDiffModeAsync(ingestionRun, yymm, workDir, connectionString);
             }
         }
@@ -217,6 +225,28 @@ public class PostalCodeSyncService
             _logger.LogError(ex, error);
 
             await _metaRecorder.RecordErrorAsync(connectionString, ingestionRun.Id, error, ex.ToString());
+            return false;
+        }
+    }
+
+    private async Task<bool> HasDataInDatabaseAsync(string connectionString)
+    {
+        try
+        {
+            using var connection = new NpgsqlConnection(connectionString);
+            await connection.OpenAsync();
+
+            var sql = "SELECT COUNT(*) FROM ext.postal_codes";
+            using var command = new NpgsqlCommand(sql, connection);
+            var result = await command.ExecuteScalarAsync();
+            var count = Convert.ToInt32(result);
+
+            _logger.LogDebug("データベース内の郵便番号レコード数: {Count}", count);
+            return count > 0;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "データベースの状態確認中にエラーが発生しました。フル取り込みを実行します。");
             return false;
         }
     }

@@ -225,138 +225,39 @@ public class MetaRecorder
             using var connection = new NpgsqlConnection(connectionString);
             await connection.OpenAsync();
 
-            // 既存のテーブルを削除（存在する場合）
-            var dropTablesSql = @"
-                DROP TABLE IF EXISTS ext.ingestion_files CASCADE;
-                DROP TABLE IF EXISTS ext.ingestion_runs CASCADE;
-                DROP TABLE IF EXISTS ext.postal_codes_landed CASCADE;
-                DROP TABLE IF EXISTS ext.postal_codes CASCADE;";
+            // テーブルの存在確認のみ（作成・削除は行わない）
+            var checkTablesSql = @"
+                SELECT
+                    EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'ext' AND table_name = 'ingestion_runs') as runs_exists,
+                    EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'ext' AND table_name = 'ingestion_files') as files_exists,
+                    EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'ext' AND table_name = 'postal_codes_landed') as landed_exists,
+                    EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'ext' AND table_name = 'postal_codes') as postal_exists;";
 
-            using var dropCommand = new NpgsqlCommand(dropTablesSql, connection);
-            await dropCommand.ExecuteNonQueryAsync();
+            using var checkCommand = new NpgsqlCommand(checkTablesSql, connection);
+            using var reader = await checkCommand.ExecuteReaderAsync();
 
-            // ext.ingestion_runsテーブルの作成
-            var createRunsTableSql = @"
-                CREATE TABLE ext.ingestion_runs (
-                    id SERIAL PRIMARY KEY,
-                    started_at TIMESTAMP WITH TIME ZONE NOT NULL,
-                    completed_at TIMESTAMP WITH TIME ZONE,
-                    status VARCHAR(20) NOT NULL CHECK (status IN ('InProgress', 'Succeeded', 'Failed')),
-                    mode VARCHAR(20) NOT NULL CHECK (mode IN ('Full', 'Diff')),
-                    yymm VARCHAR(4),
-                    version_date DATE NOT NULL,
-                    total_records INTEGER,
-                    added_records INTEGER,
-                    updated_records INTEGER,
-                    deleted_records INTEGER,
-                    errors JSONB,
-                    summary TEXT,
-                    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-                );";
+            if (await reader.ReadAsync())
+            {
+                var runsExists = reader.GetBoolean(0);
+                var filesExists = reader.GetBoolean(1);
+                var landedExists = reader.GetBoolean(2);
+                var postalExists = reader.GetBoolean(3);
 
-            using var runsCommand = new NpgsqlCommand(createRunsTableSql, connection);
-            await runsCommand.ExecuteNonQueryAsync();
+                if (!runsExists || !filesExists || !landedExists || !postalExists)
+                {
+                    _logger.LogError("必要なテーブルが存在しません。以下のSQLスクリプトを実行してください: create_tables.sql");
+                    _logger.LogError("存在しないテーブル: ingestion_runs={RunsExists}, ingestion_files={FilesExists}, postal_codes_landed={LandedExists}, postal_codes={PostalExists}",
+                        runsExists, filesExists, landedExists, postalExists);
+                    return false;
+                }
+            }
 
-            // ext.ingestion_filesテーブルの作成
-            var createFilesTableSql = @"
-                CREATE TABLE ext.ingestion_files (
-                    id SERIAL PRIMARY KEY,
-                    ingestion_run_id INTEGER NOT NULL REFERENCES ext.ingestion_runs(id) ON DELETE CASCADE,
-                    file_name VARCHAR(255) NOT NULL,
-                    file_type VARCHAR(20) NOT NULL CHECK (file_type IN ('Full', 'Add', 'Del')),
-                    file_path TEXT NOT NULL,
-                    file_size BIGINT NOT NULL,
-                    sha256_hash VARCHAR(64),
-                    downloaded_at TIMESTAMP WITH TIME ZONE NOT NULL,
-                    processed_at TIMESTAMP WITH TIME ZONE,
-                    errors TEXT,
-                    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-                );";
-
-            using var filesCommand = new NpgsqlCommand(createFilesTableSql, connection);
-            await filesCommand.ExecuteNonQueryAsync();
-
-            // ext.postal_codes_landedテーブルの作成
-            var createLandedTableSql = @"
-                CREATE TABLE ext.postal_codes_landed (
-                    id SERIAL PRIMARY KEY,
-                    postal_code VARCHAR(7) NOT NULL,
-                    local_government_code VARCHAR(6) NOT NULL,
-                    old_zip_code5 VARCHAR(5) NOT NULL,
-                    prefecture_katakana VARCHAR(50) NOT NULL,
-                    city_katakana VARCHAR(50) NOT NULL,
-                    town_katakana VARCHAR(50) NOT NULL,
-                    prefecture VARCHAR(50) NOT NULL,
-                    city VARCHAR(50) NOT NULL,
-                    town VARCHAR(50) NOT NULL,
-                    is_multi_zip BOOLEAN NOT NULL,
-                    is_koaza BOOLEAN NOT NULL,
-                    is_chome BOOLEAN NOT NULL,
-                    is_multi_town BOOLEAN NOT NULL,
-                    update_status INTEGER NOT NULL,
-                    update_reason INTEGER NOT NULL,
-                    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-                );";
-
-            using var landedCommand = new NpgsqlCommand(createLandedTableSql, connection);
-            await landedCommand.ExecuteNonQueryAsync();
-
-            // ext.postal_codesテーブルの作成
-            var createPostalCodesTableSql = @"
-                CREATE TABLE ext.postal_codes (
-                    id SERIAL PRIMARY KEY,
-                    postal_code VARCHAR(7) NOT NULL,
-                    local_government_code VARCHAR(6) NOT NULL,
-                    old_zip_code5 VARCHAR(5) NOT NULL,
-                    prefecture_katakana VARCHAR(50) NOT NULL,
-                    city_katakana VARCHAR(50) NOT NULL,
-                    town_katakana VARCHAR(50) NOT NULL,
-                    prefecture VARCHAR(50) NOT NULL,
-                    city VARCHAR(50) NOT NULL,
-                    town VARCHAR(50) NOT NULL,
-                    is_multi_zip BOOLEAN NOT NULL,
-                    is_koaza BOOLEAN NOT NULL,
-                    is_chome BOOLEAN NOT NULL,
-                    is_multi_town BOOLEAN NOT NULL,
-                    update_status INTEGER NOT NULL,
-                    update_reason INTEGER NOT NULL,
-                    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-                );";
-
-            using var postalCodesCommand = new NpgsqlCommand(createPostalCodesTableSql, connection);
-            await postalCodesCommand.ExecuteNonQueryAsync();
-
-            // インデックスの作成
-            var createIndexesSql = @"
-                CREATE INDEX IF NOT EXISTS ix_postal_codes_comp
-                    ON ext.postal_codes (postal_code, prefecture, city, town);
-
-                CREATE INDEX IF NOT EXISTS ix_postal_codes_prefecture
-                    ON ext.postal_codes (prefecture);
-
-                CREATE INDEX IF NOT EXISTS ix_postal_codes_city
-                    ON ext.postal_codes (city);
-
-                CREATE INDEX IF NOT EXISTS ix_postal_codes_zip
-                    ON ext.postal_codes (postal_code);
-
-                CREATE INDEX IF NOT EXISTS ix_ingestion_runs_status
-                    ON ext.ingestion_runs (status);
-
-                CREATE INDEX IF NOT EXISTS ix_ingestion_runs_mode
-                    ON ext.ingestion_runs (mode);";
-
-            using var indexesCommand = new NpgsqlCommand(createIndexesSql, connection);
-            await indexesCommand.ExecuteNonQueryAsync();
-
-            _logger.LogInformation("メタ情報テーブルの存在確認・作成が完了しました");
-
+            _logger.LogInformation("メタ情報テーブルの存在確認が完了しました");
             return true;
         }
         catch (Exception ex)
         {
-            var error = $"メタ情報テーブルの確認・作成中にエラーが発生しました: {ex.Message}";
+            var error = $"メタ情報テーブルの確認中にエラーが発生しました: {ex.Message}";
             _logger.LogError(ex, error);
             return false;
         }
