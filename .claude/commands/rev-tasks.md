@@ -91,7 +91,7 @@
 
 - [x] **タスク完了** (実装済み)
 - **タスクタイプ**: DIRECT
-- **実装ファイル**: 
+- **実装ファイル**:
   - `package.json`
   - `tsconfig.json`
   - `.env.example`
@@ -103,7 +103,7 @@
 
 - [x] **タスク完了** (実装済み)
 - **タスクタイプ**: DIRECT
-- **実装ファイル**: 
+- **実装ファイル**:
   - `src/database/connection.ts`
   - `migrations/001_initial.sql`
 - **実装詳細**:
@@ -116,7 +116,7 @@
 
 - [x] **タスク完了** (実装済み)
 - **タスクタイプ**: TDD
-- **実装ファイル**: 
+- **実装ファイル**:
   - `src/auth/auth.controller.ts`
   - `src/auth/auth.service.ts`
   - `src/auth/jwt.strategy.ts`
@@ -140,7 +140,7 @@
 
 - [x] **タスク完了** (実装済み)
 - **タスクタイプ**: TDD
-- **実装ファイル**: 
+- **実装ファイル**:
   - `src/components/Login/LoginForm.tsx`
   - `src/components/Login/LoginForm.module.css`
   - `src/hooks/useAuth.ts`
@@ -186,7 +186,7 @@ graph TD
     B --> C[DISCOVERED-101: ユーザー認証API]
     C --> D[DISCOVERED-201: ログイン画面]
     D --> E[未実装: E2Eテスト]
-    
+
     F[未実装: API仕様書] --> G[未実装: 開発者ガイド]
 ```
 
@@ -267,4 +267,4 @@ claude code rev-tasks --format json
 - 発見されたタスク数と推定工数を表示
 - 実装済み/未実装の機能一覧を表示
 - 技術的負債・改善推奨事項をサマリー表示
-- 次のリバースエンジニアリングステップ（設計書生成等）を提案 
+- 次のリバースエンジニアリングステップ（設計書生成等）を提案

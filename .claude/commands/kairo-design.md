@@ -96,7 +96,7 @@ sequenceDiagram
     participant F as フロントエンド
     participant B as バックエンド
     participant D as データベース
-    
+
     U->>F: アクション
     F->>B: APIリクエスト
     B->>D: クエリ実行

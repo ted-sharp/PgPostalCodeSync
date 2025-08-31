@@ -2,8 +2,8 @@
 
 ## 概要
 
-全タスク数: 12  
-推定作業時間: 7.5人日  
+全タスク数: 12
+推定作業時間: 7.5人日
 クリティカルパス: TASK-001 → TASK-002 → TASK-101 → TASK-102 → TASK-103 → TASK-201 → TASK-301
 
 ## タスク一覧
@@ -13,7 +13,7 @@
 #### TASK-001: プロジェクト基本設定・DI設定
 
 - [x] **タスク完了**
-- **タスクタイプ**: DIRECT  
+- **タスクタイプ**: DIRECT
 - **要件リンク**: 設計方針全体
 - **依存タスク**: なし
 - **実装詳細**:
@@ -229,7 +229,7 @@ gantt
     TASK-002 設定管理・データモデル  :a2, after a1, 1d
     section コアサービス
     TASK-101 DownloadService       :b1, after a2, 1d
-    TASK-102 DatabaseService       :b2, after a2, 1d  
+    TASK-102 DatabaseService       :b2, after a2, 1d
     TASK-103 PostalCodeSyncService :b3, after b1 b2, 2d
     section ログ・エラー強化
     TASK-201 ログ・エラーハンドリング :c1, after b3, 1d

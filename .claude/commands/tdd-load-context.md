@@ -13,12 +13,12 @@ Taskツールで以下のファイルを並列読み込み:
    - `docs/implements/{{task_id}}/{feature_name}-memo.md`
    - 既存の開発履歴、フェーズ情報、検証結果を把握
 
-2. 要件定義文書の確認  
+2. 要件定義文書の確認
    - `docs/implements/{{task_id}}/{feature_name}-requirements.md`
    - 機能仕様、入出力、制約条件を把握
 
 3. テストケース定義の確認
-   - `docs/implements/{{task_id}}/{feature_name}-testcases.md` 
+   - `docs/implements/{{task_id}}/{feature_name}-testcases.md`
    - 予定テストケース、分類、期待値を把握
 
 4. プロジェクト設計文書の確認（存在する場合）
@@ -65,7 +65,7 @@ Taskツールによる並列読み込み完了後、以下の形式で情報を�
 - **予定テストケース総数**: [数]個
 - **テスト分類**:
   - 正常系: [数]個
-  - 異常系: [数]個  
+  - 異常系: [数]個
   - エッジケース: [数]個
 - **実装済みテスト**: [数]個 (実装率: [%])
 - **テスト成功率**: [通過数]/[実装数] ([%])

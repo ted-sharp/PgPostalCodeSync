@@ -1,6 +1,6 @@
 # 設計検討Q&A - PgPostalCodeSync
 
-**作成日:** 2025-08-30 (JST)  
+**作成日:** 2025-08-30 (JST)
 **目的:** 設計検討過程で提起された疑問点と採用理由をまとめる
 
 ---
@@ -105,8 +105,8 @@ WITH (FORMAT CSV, DELIMITER ',', QUOTE '"', ESCAPE '"')
 ### Q: 外部キー制約は設定すべきか？
 **A: 設定する（データ整合性のため）**
 ```sql
-ALTER TABLE ext.ingestion_files 
-  ADD CONSTRAINT fk_ingestion_files_run_id 
+ALTER TABLE ext.ingestion_files
+  ADD CONSTRAINT fk_ingestion_files_run_id
   FOREIGN KEY (run_id) REFERENCES ext.ingestion_runs(run_id);
 ```
 - 理由：データ整合性保証、運用ミスの防止

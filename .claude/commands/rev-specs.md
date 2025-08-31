@@ -118,7 +118,7 @@ describe('POST /auth/login', () => {
         email: 'test@example.com',
         password: 'password123'
       });
-    
+
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
     expect(response.body.data.token).toBeDefined();
@@ -129,7 +129,7 @@ describe('POST /auth/login', () => {
     const response = await request(app)
       .post('/auth/login')
       .send(validCredentials);
-    
+
     const token = response.body.data.token;
     expect(token).toMatch(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/);
   });
@@ -146,7 +146,7 @@ describe('POST /auth/login - 異常系', () => {
         email: 'invalid-email',
         password: 'password123'
       });
-    
+
     expect(response.status).toBe(400);
     expect(response.body.success).toBe(false);
     expect(response.body.error.code).toBe('VALIDATION_ERROR');
@@ -159,7 +159,7 @@ describe('POST /auth/login - 異常系', () => {
         email: 'nonexistent@example.com',
         password: 'password123'
       });
-    
+
     expect(response.status).toBe(401);
     expect(response.body.error.code).toBe('INVALID_CREDENTIALS');
   });
@@ -171,7 +171,7 @@ describe('POST /auth/login - 異常系', () => {
         email: 'test@example.com',
         password: 'wrongpassword'
       });
-    
+
     expect(response.status).toBe(401);
     expect(response.body.error.code).toBe('INVALID_CREDENTIALS');
   });
@@ -189,7 +189,7 @@ describe('POST /auth/login - 境界値', () => {
         email: 'test@example.com',
         password: '12345678'
       });
-    
+
     expect(response.status).toBe(200);
   });
 
@@ -202,7 +202,7 @@ describe('POST /auth/login - 境界値', () => {
         email: longEmail,
         password: 'password123'
       });
-    
+
     expect(response.status).toBe(400);
   });
 });
@@ -220,7 +220,7 @@ import { LoginForm } from './LoginForm';
 describe('LoginForm', () => {
   it('必要な要素が表示される', () => {
     render(<LoginForm onSubmit={jest.fn()} />);
-    
+
     expect(screen.getByLabelText('メールアドレス')).toBeInTheDocument();
     expect(screen.getByLabelText('パスワード')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'ログイン' })).toBeInTheDocument();
@@ -228,7 +228,7 @@ describe('LoginForm', () => {
 
   it('初期状態でエラーメッセージが非表示', () => {
     render(<LoginForm onSubmit={jest.fn()} />);
-    
+
     expect(screen.queryByText(/エラー/)).not.toBeInTheDocument();
   });
 });
@@ -243,11 +243,11 @@ describe('LoginForm - ユーザーインタラクション', () => {
   it('フォーム送信時にonSubmitが呼ばれる', async () => {
     const mockSubmit = jest.fn();
     render(<LoginForm onSubmit={mockSubmit} />);
-    
+
     await userEvent.type(screen.getByLabelText('メールアドレス'), 'test@example.com');
     await userEvent.type(screen.getByLabelText('パスワード'), 'password123');
     await userEvent.click(screen.getByRole('button', { name: 'ログイン' }));
-    
+
     expect(mockSubmit).toHaveBeenCalledWith({
       email: 'test@example.com',
       password: 'password123'
@@ -257,9 +257,9 @@ describe('LoginForm - ユーザーインタラクション', () => {
   it('バリデーションエラー時に送信されない', async () => {
     const mockSubmit = jest.fn();
     render(<LoginForm onSubmit={mockSubmit} />);
-    
+
     await userEvent.click(screen.getByRole('button', { name: 'ログイン' }));
-    
+
     expect(mockSubmit).not.toHaveBeenCalled();
     expect(screen.getByText('メールアドレスは必須です')).toBeInTheDocument();
   });
@@ -292,7 +292,7 @@ describe('AuthService', () => {
         email: 'test@example.com',
         hashedPassword: 'hashed_password'
       };
-      
+
       mockUserRepository.findByEmail.mockResolvedValue(mockUser);
       jest.spyOn(authService, 'verifyPassword').mockResolvedValue(true);
       jest.spyOn(authService, 'generateToken').mockReturnValue('mock_token');
@@ -362,7 +362,7 @@ describe('パフォーマンステスト', () => {
 describe('セキュリティテスト', () => {
   it('SQLインジェクション対策', async () => {
     const maliciousInput = "'; DROP TABLE users; --";
-    
+
     const response = await request(app)
       .post('/auth/login')
       .send({
@@ -372,7 +372,7 @@ describe('セキュリティテスト', () => {
 
     // システムが正常に動作し、データベースが破損していない
     expect(response.status).toBe(400);
-    
+
     // ユーザーテーブルが依然として存在することを確認
     const usersResponse = await request(app)
       .get('/users')
@@ -382,7 +382,7 @@ describe('セキュリティテスト', () => {
 
   it('XSS対策', async () => {
     const xssPayload = '<script>alert("XSS")</script>';
-    
+
     const response = await request(app)
       .post('/users')
       .set('Authorization', 'Bearer ' + validToken)
@@ -407,18 +407,18 @@ describe('セキュリティテスト', () => {
 describe('ユーザーログインフロー', () => {
   it('正常なログインからダッシュボード表示まで', async () => {
     await page.goto('/login');
-    
+
     // ログインフォーム入力
     await page.fill('[data-testid="email-input"]', 'test@example.com');
     await page.fill('[data-testid="password-input"]', 'password123');
     await page.click('[data-testid="login-button"]');
-    
+
     // ダッシュボードへリダイレクト
     await page.waitForURL('/dashboard');
-    
+
     // ユーザー情報表示確認
     await expect(page.locator('[data-testid="user-name"]')).toContainText('テストユーザー');
-    
+
     // ログアウト機能確認
     await page.click('[data-testid="logout-button"]');
     await page.waitForURL('/login');
@@ -426,11 +426,11 @@ describe('ユーザーログインフロー', () => {
 
   it('ログイン失敗時のエラー表示', async () => {
     await page.goto('/login');
-    
+
     await page.fill('[data-testid="email-input"]', 'wrong@example.com');
     await page.fill('[data-testid="password-input"]', 'wrongpassword');
     await page.click('[data-testid="login-button"]');
-    
+
     // エラーメッセージ表示確認
     await expect(page.locator('[data-testid="error-message"]'))
       .toContainText('認証情報が正しくありません');
@@ -447,7 +447,7 @@ describe('ユーザーログインフロー', () => {
 beforeAll(async () => {
   // テスト用データベース接続
   await setupTestDatabase();
-  
+
   // マイグレーション実行
   await runMigrations();
 });
@@ -455,7 +455,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   // 各テスト前にデータをクリーンアップ
   await cleanupDatabase();
-  
+
   // 基本テストデータ投入
   await seedTestData();
 });
@@ -615,4 +615,4 @@ claude code rev-specs --priority high
 - 生成されたテストケース数と推定実装工数を表示
 - 優先順位付けされた実装推奨リストを提示
 - テスト環境の設定要件と推奨ツールを提案
-- CI/CD パイプラインへの統合案を提示 
+- CI/CD パイプラインへの統合案を提示

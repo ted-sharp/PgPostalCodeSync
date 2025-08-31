@@ -14,19 +14,19 @@ public class DownloadServiceTests : IDisposable
 
     public DownloadServiceTests()
     {
-        _mockLogger = new Mock<ILogger<DownloadService>>();
-        _httpClient = new HttpClient();
-        _downloadService = new DownloadService(_mockLogger.Object, _httpClient);
-        _tempDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        Directory.CreateDirectory(_tempDirectory);
+        this._mockLogger = new Mock<ILogger<DownloadService>>();
+        this._httpClient = new HttpClient();
+        this._downloadService = new DownloadService(this._mockLogger.Object, this._httpClient);
+        this._tempDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        Directory.CreateDirectory(this._tempDirectory);
     }
 
     public void Dispose()
     {
-        _httpClient?.Dispose();
-        if (Directory.Exists(_tempDirectory))
+        this._httpClient?.Dispose();
+        if (Directory.Exists(this._tempDirectory))
         {
-            Directory.Delete(_tempDirectory, true);
+            Directory.Delete(this._tempDirectory, true);
         }
     }
 
@@ -34,11 +34,11 @@ public class DownloadServiceTests : IDisposable
     public async Task ValidateFileAsync_ExistingFile_ShouldReturnTrue()
     {
         // Arrange
-        var testFile = Path.Combine(_tempDirectory, "test.txt");
+        var testFile = Path.Combine(this._tempDirectory, "test.txt");
         await File.WriteAllTextAsync(testFile, "test content");
 
         // Act
-        var result = await _downloadService.ValidateFileAsync(testFile);
+        var result = await this._downloadService.ValidateFileAsync(testFile);
 
         // Assert
         Assert.True(result);
@@ -48,10 +48,10 @@ public class DownloadServiceTests : IDisposable
     public async Task ValidateFileAsync_NonExistentFile_ShouldReturnFalse()
     {
         // Arrange
-        var nonExistentFile = Path.Combine(_tempDirectory, "nonexistent.txt");
+        var nonExistentFile = Path.Combine(this._tempDirectory, "nonexistent.txt");
 
         // Act
-        var result = await _downloadService.ValidateFileAsync(nonExistentFile);
+        var result = await this._downloadService.ValidateFileAsync(nonExistentFile);
 
         // Assert
         Assert.False(result);
@@ -61,12 +61,12 @@ public class DownloadServiceTests : IDisposable
     public async Task ValidateFileAsync_FileSmallerThanMinimumSize_ShouldReturnFalse()
     {
         // Arrange
-        var testFile = Path.Combine(_tempDirectory, "small.txt");
+        var testFile = Path.Combine(this._tempDirectory, "small.txt");
         await File.WriteAllTextAsync(testFile, "small");
         var minimumSize = 1000L;
 
         // Act
-        var result = await _downloadService.ValidateFileAsync(testFile, minimumSize);
+        var result = await this._downloadService.ValidateFileAsync(testFile, minimumSize);
 
         // Assert
         Assert.False(result);
@@ -76,13 +76,13 @@ public class DownloadServiceTests : IDisposable
     public async Task ValidateFileAsync_FileLargerThanMinimumSize_ShouldReturnTrue()
     {
         // Arrange
-        var testFile = Path.Combine(_tempDirectory, "large.txt");
+        var testFile = Path.Combine(this._tempDirectory, "large.txt");
         var content = new string('A', 2000);
         await File.WriteAllTextAsync(testFile, content);
         var minimumSize = 1000L;
 
         // Act
-        var result = await _downloadService.ValidateFileAsync(testFile, minimumSize);
+        var result = await this._downloadService.ValidateFileAsync(testFile, minimumSize);
 
         // Assert
         Assert.True(result);

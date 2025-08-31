@@ -29,40 +29,40 @@ VERIFY_DISALLOWED_TOOLS="Bash(git add),Bash(git commit),Bash(git push)"
 # TDDサイクル実行関数
 run_tdd_cycle() {
     local test_case=$1
-    
+
     echo "🔴 RED フェーズ開始..."
     if ! claude -p "/tdd-red $test_case 不足テストの追加実装" --allowedTools "$ALLOWED_TOOLS" --disallowedTools "$DISALLOWED_TOOLS"; then
         echo -e "${RED}❌ RED フェーズ失敗${NC}"
         exit 1
     fi
     echo -e "${GREEN}✅ RED フェーズ完了${NC}"
-    
+
     echo "🟢 GREEN フェーズ開始..."
     if ! claude -p "/tdd-green $test_case" --allowedTools "$ALLOWED_TOOLS" --disallowedTools "$DISALLOWED_TOOLS"; then
         echo -e "${RED}❌ GREEN フェーズ失敗${NC}"
         exit 1
     fi
     echo -e "${GREEN}✅ GREEN フェーズ完了${NC}"
-    
+
     echo "🔵 REFACTOR フェーズ開始..."
     if ! claude -p "/tdd-refactor $test_case" --allowedTools "$ALLOWED_TOOLS" --disallowedTools "$DISALLOWED_TOOLS"; then
         echo -e "${RED}❌ REFACTOR フェーズ失敗${NC}"
         exit 1
     fi
     echo -e "${GREEN}✅ REFACTOR フェーズ完了${NC}"
-    
+
     echo "🔍 VERIFY COMPLETE フェーズ開始..."
     local verify_result
     verify_result=$(claude -p "/tdd-verify-complete $test_case" --allowedTools "$VERIFY_ALLOWED_TOOLS" --disallowedTools "$VERIFY_DISALLOWED_TOOLS" 2>&1)
     local verify_exit_code=$?
-    
+
     if [ $verify_exit_code -ne 0 ]; then
         echo -e "${RED}❌ VERIFY COMPLETE フェーズ失敗${NC}"
         exit 1
     fi
-    
+
     echo -e "${GREEN}✅ VERIFY COMPLETE フェーズ完了${NC}"
-    
+
     # 結果の判定
     if echo "$verify_result" | grep -E "(品質基準を満たしています|実装完了|検証完了)" > /dev/null; then
         echo -e "${GREEN}🎉 TDDサイクル完了${NC}: $test_case のTDDサイクルが正常に完了しました"
@@ -81,7 +81,7 @@ run_tdd_cycle() {
         echo "2) RED フェーズから継続する"
         echo "3) スクリプトを終了する"
         echo ""
-        
+
         while true; do
             read -p "選択 (1/2/3): " choice
             case $choice in
@@ -113,7 +113,7 @@ show_completion_time() {
     local hours=$((duration / 3600))
     local minutes=$(((duration % 3600) / 60))
     local seconds=$((duration % 60))
-    
+
     printf "⏱️  実行時間: "
     if [ $hours -gt 0 ]; then
         printf "%d時間%d分%d秒\n" $hours $minutes $seconds
@@ -122,9 +122,9 @@ show_completion_time() {
     else
         printf "%d秒\n" $seconds
     fi
-    
+
     printf "🕐 終了時刻: %s\n" "$(date +'%Y-%m-%d %H:%M:%S')"
-    
+
     if [ $exit_code -eq 0 ]; then
         echo -e "${GREEN}✅ 正常終了${NC}"
     else
@@ -143,12 +143,12 @@ cycle_count=0
 while [ $cycle_count -lt $max_cycles ]; do
     cycle_count=$((cycle_count + 1))
     echo -e "${BLUE}=== サイクル $cycle_count 開始 ===${NC}"
-    
+
     if run_tdd_cycle "$TEST_CASE_NAME"; then
         echo -e "${GREEN}🎉 全体完了: TDDサイクルが正常に完了しました${NC}"
         exit 0
     fi
-    
+
     echo -e "${YELLOW}サイクル $cycle_count 完了、次のサイクルに進みます...${NC}"
     echo ""
 done

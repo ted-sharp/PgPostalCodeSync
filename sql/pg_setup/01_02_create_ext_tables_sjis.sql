@@ -136,4 +136,3 @@ COMMENT ON COLUMN ext.postal_codes_landed.is_chome IS '���ڃt���O:�
 COMMENT ON COLUMN ext.postal_codes_landed.is_multi_town IS '��������t���O:��̗X�֔ԍ��œ�ȏ�̒����\���ꍇ�̕\���i"1": �Y���A"0": �Y�������j';
 COMMENT ON COLUMN ext.postal_codes_landed.update_status IS '�X�V�t���O:�X�V�̕\���i"0": �ύX�Ȃ��A"1": �ύX����A"2": �p�~�j';
 COMMENT ON COLUMN ext.postal_codes_landed.update_reason IS '�X�V���R:�ύX���R�i"0": �ύX�Ȃ��A"1": �s�����{�s�A"2": �Z���\���̎��{�A"3": ��搮���A"4": �X�֋撲�����A"5": �����A"6": �p�~�j';
-

@@ -153,7 +153,7 @@ sequenceDiagram
     participant F as フロントエンド
     participant B as バックエンド
     participant D as データベース
-    
+
     U->>F: ログイン情報入力
     F->>B: POST /auth/login
     B->>D: ユーザー検証
@@ -319,7 +319,7 @@ erDiagram
         timestamp created_at
         timestamp updated_at
     }
-    
+
     POSTS {
         uuid id PK
         uuid user_id FK
@@ -328,7 +328,7 @@ erDiagram
         timestamp created_at
         timestamp updated_at
     }
-    
+
     USERS ||--o{ POSTS : creates
 \`\`\`
 
@@ -490,4 +490,4 @@ claude code rev-design --format markdown,openapi
 - 生成された設計書ファイルの一覧を表示
 - 抽出されたAPI数、テーブル数、型定義数等の統計情報を表示
 - 不足している設計要素や推奨改善点を提示
-- 次のリバースエンジニアリングステップ（要件定義生成等）を提案 
+- 次のリバースエンジニアリングステップ（要件定義生成等）を提案

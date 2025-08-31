@@ -4,20 +4,20 @@ repos:
     hooks:
       - id: dotnet-build
         name: Build C# project
-        entry: bash -c "cd src_dotnet/VoicevoxRunCached && dotnet build --verbosity quiet"
+        entry: bash -c "cd src && dotnet build --verbosity quiet"
         language: system
         pass_filenames: false
         always_run: true
-        
+
       - id: dotnet-format
         name: Format C# code
-        entry: bash -c "cd src_dotnet/VoicevoxRunCached && dotnet format --verbosity quiet"
+        entry: bash -c "cd src && dotnet format --verbosity quiet"
         language: system
         files: '\.cs$'
-        
+
       - id: dotnet-test
         name: Run C# tests
-        entry: bash -c "cd src_dotnet/VoicevoxRunCached && if find . -name '*.Tests.csproj' -o -name '*Test*.csproj' | grep -q .; then dotnet test --verbosity quiet; else echo 'No test projects found'; fi"
+        entry: bash -c "cd src && if find . -name '*.Tests.csproj' -o -name '*Test*.csproj' | grep -q .; then dotnet test --verbosity quiet; else echo 'No test projects found'; fi"
         language: system
         pass_filenames: false
         always_run: true

@@ -6,7 +6,7 @@
 - **src/PgPostalCodeSync/Services/PostalCodeSyncService.cs**
   - メイン処理クラス
   - 差分・フル取り込み制御
-- **src/PgPostalCodeSync/Services/DownloadService.cs**  
+- **src/PgPostalCodeSync/Services/DownloadService.cs**
   - ZIP ファイルダウンロード
   - ファイル検証
 - **src/PgPostalCodeSync/Services/DatabaseService.cs**
@@ -21,7 +21,7 @@
   - ワークディレクトリパス
 
 ### 変更ファイル
-- **src/PgPostalCodeSync/Program.cs**  
+- **src/PgPostalCodeSync/Program.cs**
   - DI コンテナ設定
   - コマンドライン引数解析
   - メイン処理呼び出し
@@ -32,7 +32,7 @@
 既存の SQL スキーマ（ext.* テーブル）をそのまま使用:
 
 - **ext.postal_codes_landed**: CSV データ着地用（一時テーブル）
-- **ext.postal_codes**: 本番データテーブル  
+- **ext.postal_codes**: 本番データテーブル
 - **ext.ingestion_runs**: 実行メタ管理
 - **ext.ingestion_files**: ファイルメタ管理
 
@@ -71,7 +71,7 @@ Program.cs (エントリポイント)
 5. UPSERT (追加) / DELETE (削除) 実行
 6. メタ情報記録
 
-### フル取り込みフロー  
+### フル取り込みフロー
 1. utf_ken_all.zip ダウンロード
 2. ZIP解凍 → CSV読み込み
 3. ext.postal_codes_new 作成・投入
@@ -121,7 +121,7 @@ Program.cs (エントリポイント)
 
 ### コマンドライン引数
 - `--full`: 強制フル取り込み
-- `--yymm=2508`: 指定年月処理  
+- `--yymm=2508`: 指定年月処理
 - `--workdir="C:\\temp"`: 作業ディレクトリ指定
 
 ## パッケージ利用方針

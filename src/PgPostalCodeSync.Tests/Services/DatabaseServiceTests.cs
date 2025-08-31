@@ -14,27 +14,27 @@ public class DatabaseServiceTests
 
     public DatabaseServiceTests()
     {
-        _mockLogger = new Mock<ILogger<DatabaseService>>();
-        _mockConfiguration = new Mock<IConfiguration>();
-        
+        this._mockLogger = new Mock<ILogger<DatabaseService>>();
+        this._mockConfiguration = new Mock<IConfiguration>();
+
         // Mock the ConnectionStrings section
         var mockConnectionStringsSection = new Mock<IConfigurationSection>();
-        var mockDefaultConnectionSection = new Mock<IConfigurationSection>();
-        mockDefaultConnectionSection.Setup(x => x.Value).Returns("Host=localhost;Database=testdb;Username=test;Password=test");
-        
-        mockConnectionStringsSection.Setup(x => x["DefaultConnection"]).Returns("Host=localhost;Database=testdb;Username=test;Password=test");
-        mockConnectionStringsSection.Setup(x => x.GetSection("DefaultConnection")).Returns(mockDefaultConnectionSection.Object);
-        
-        _mockConfiguration.Setup(x => x.GetSection("ConnectionStrings")).Returns(mockConnectionStringsSection.Object);
-            
-        _databaseService = new DatabaseService(_mockLogger.Object, _mockConfiguration.Object);
+        var mockPostalDbConnectionSection = new Mock<IConfigurationSection>();
+        mockPostalDbConnectionSection.Setup(x => x.Value).Returns("Host=localhost;Database=testdb;Username=test;Password=test");
+
+        mockConnectionStringsSection.Setup(x => x["PostalDb"]).Returns("Host=localhost;Database=testdb;Username=test;Password=test");
+        mockConnectionStringsSection.Setup(x => x.GetSection("PostalDb")).Returns(mockPostalDbConnectionSection.Object);
+
+        this._mockConfiguration.Setup(x => x.GetSection("ConnectionStrings")).Returns(mockConnectionStringsSection.Object);
+
+        this._databaseService = new DatabaseService(this._mockLogger.Object, this._mockConfiguration.Object);
     }
 
     [Fact]
     public async Task HasExistingDataAsync_WithInvalidConnection_ShouldReturnFalse()
     {
         // Act
-        var result = await _databaseService.HasExistingDataAsync();
+        var result = await this._databaseService.HasExistingDataAsync();
 
         // Assert - Should return false due to connection failure
         Assert.False(result);
@@ -49,7 +49,7 @@ public class DatabaseServiceTests
 
         // Act & Assert - Should throw due to connection failure
         await Assert.ThrowsAnyAsync<Exception>(async () =>
-            await _databaseService.CreateIngestionRunAsync(runType, status));
+            await this._databaseService.CreateIngestionRunAsync(runType, status));
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public class DatabaseServiceTests
 
         // Act & Assert - Should throw due to connection failure
         await Assert.ThrowsAnyAsync<Exception>(async () =>
-            await _databaseService.BulkInsertPostalCodesAsync(records));
+            await this._databaseService.BulkInsertPostalCodesAsync(records));
     }
 
     [Fact]
@@ -82,7 +82,7 @@ public class DatabaseServiceTests
 
         // Act & Assert - Should throw due to connection failure
         await Assert.ThrowsAnyAsync<Exception>(async () =>
-            await _databaseService.RenameTableAsync(fromTableName, toTableName));
+            await this._databaseService.RenameTableAsync(fromTableName, toTableName));
     }
 
     [Fact]
@@ -94,6 +94,6 @@ public class DatabaseServiceTests
 
         // Act & Assert - Should throw due to connection failure
         await Assert.ThrowsAnyAsync<Exception>(async () =>
-            await _databaseService.BackupTableAsync(tableName, backupSuffix));
+            await this._databaseService.BackupTableAsync(tableName, backupSuffix));
     }
 }

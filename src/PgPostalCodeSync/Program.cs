@@ -15,17 +15,17 @@ public class Program
     public static async Task<int> Main(string[] args)
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-        
+
         var host = CreateHostBuilder(args).Build();
-        
+
         try
         {
             var logger = host.Services.GetRequiredService<ILogger<Program>>();
             logger.LogInformation("PgPostalCodeSync アプリケーションを開始します");
-            
+
             var syncService = host.Services.GetRequiredService<PostalCodeSyncService>();
             await syncService.ExecuteAsync(args);
-            
+
             logger.LogInformation("PgPostalCodeSync アプリケーションが正常終了しました");
             return 0;
         }
@@ -41,7 +41,7 @@ public class Program
             host.Dispose();
         }
     }
-    
+
     private static IHostBuilder CreateHostBuilder(string[] args)
     {
         return Host.CreateDefaultBuilder(args)
@@ -54,7 +54,7 @@ public class Program
             .ConfigureServices((context, services) =>
             {
                 services.Configure<AppSettings>(context.Configuration.GetSection("PostalCodeSync"));
-                
+
                 services.AddHttpClient();
                 services.AddSingleton<DownloadService>();
                 services.AddSingleton<DatabaseService>();
