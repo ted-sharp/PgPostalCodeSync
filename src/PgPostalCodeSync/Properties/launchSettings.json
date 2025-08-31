@@ -1,0 +1,28 @@
+{
+  "profiles": {
+    "PgPostalCodeSync": {
+      "commandName": "Project",
+      "commandLineArgs": "",
+      "workingDirectory": "$(ProjectDir)",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "PgPostalCodeSync (full)": {
+      "commandName": "Project",
+      "commandLineArgs": "--full",
+      "workingDirectory": "$(ProjectDir)",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "PgPostalCodeSync (incremental)": {
+      "commandName": "Project",
+      "commandLineArgs": "",
+      "workingDirectory": "$(ProjectDir)",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
