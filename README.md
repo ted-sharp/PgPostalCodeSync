@@ -2,6 +2,27 @@
 
 PostgreSQL用の郵便番号データ同期コンソールアプリケーション
 
+## 開発環境セットアップ
+
+### Git Worktree による各ブランチの比較
+
+このプロジェクトでは、Git Worktree の使用を推奨します。
+Git Worktree による各ブランチの比較検討を行うための実験プロジェクトです。
+
+#### 基本的な使い方
+
+```bash
+# ブランチを作成してから worktree を作成
+git branch app/cli/by-superclaude
+git worktree add ../PgPostalCodeSync-by-sc app/cli/by-superclaude
+
+# worktree の一覧を確認
+git worktree list
+
+# worktree を削除
+git worktree remove ../PgPostalCodeSync-by-sc
+```
+
 ## 概要
 
 日本郵便の住所の郵便番号（UTF-8形式）を毎月定期的に取り込み、PostgreSQLデータベースに保持するコンソールアプリケーションです。
